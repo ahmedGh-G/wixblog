@@ -1,0 +1,32 @@
+spring:
+
+  application:
+    name: wixblog
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wixblog
+    username: wixblog
+    password: 123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    open-in-view: false
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  jwt:
+    public-key-location: classpath:certs/public-key.pem
+    private-key-location: classpath:certs/private_pkcs8.pem
+
+
+server:
+  port: 8080
