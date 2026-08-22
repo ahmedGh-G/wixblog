@@ -19,13 +19,19 @@ spring:
       hibernate:
         format_sql: true
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: "classpath:certs/public2-key.pem"
+          private-key-location: "classpath:certs/private2_pkcs8.pem"
+          issuer: wixblog-api
+          access-token-expiration-seconds: 1800
+
   flyway:
     enabled: true
     locations: classpath:db/migration
 
-  jwt:
-    public-key-location: classpath:certs/public-key.pem
-    private-key-location: classpath:certs/private_pkcs8.pem
 
 
 server:

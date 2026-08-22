@@ -1,5 +1,7 @@
 package com.tech.wixblog.auth.controller;
 
+import com.tech.wixblog.auth.dto.LoginRequest;
+import com.tech.wixblog.auth.dto.LoginResponse;
 import com.tech.wixblog.auth.dto.RegisterRequest;
 import com.tech.wixblog.auth.dto.RegisterResponse;
 import com.tech.wixblog.auth.service.AuthenticationService;
@@ -31,5 +33,16 @@ public class AuthController {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login (
+            @Valid @RequestBody LoginRequest request
+                                               ) {
+
+        LoginResponse response =
+                authenticationService.login(request);
+
+        return ResponseEntity.ok(response);
     }
 }

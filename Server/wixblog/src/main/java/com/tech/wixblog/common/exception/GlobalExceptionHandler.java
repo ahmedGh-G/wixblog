@@ -1,11 +1,15 @@
 package com.tech.wixblog.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,75 +17,85 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<ApiError> handleConflict(
-        ResourceAlreadyExistsException exception,
-        HttpServletRequest request
-    ) {
+    @ExceptionHandler(
+            ResourceAlreadyExistsException.class
+    )
+    public ResponseEntity<ApiError> handleConflict (
+            ResourceAlreadyExistsException exception,
+            HttpServletRequest request
+                                                   ) {
 
-        ApiError error = new ApiError(
-            Instant.now(),
-            HttpStatus.CONFLICT.value(),
-            "Conflict",
-            exception.getMessage(),
-            request.getRequestURI(),
-            List.of()
-        );
-
-        return ResponseEntity
-            .status(HttpStatus.CONFLICT)
-            .body(error);
+        return buildError(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(
+            MethodArgumentNotValidException.class
+    )
     public ResponseEntity<ApiError> handleValidation(
-        MethodArgumentNotValidException exception,
-        HttpServletRequest request
-    ) {
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+                                                    ) {
 
-        List<ApiError.FieldError> fieldErrors =
-            exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error ->
-                    new ApiError.FieldError(
-                        error.getField(),
-                        error.getDefaultMessage()
-                    )
-                )
-                .toList();
+        List<ApiError.FieldError> fields =
+                exception.getBindingResult()
+                        .getFieldErrors()
+                        .stream()
+                        .map(error ->
+                                     new ApiError.FieldError(
+                                             error.getField(),
+                                             error.getDefaultMessage()
+                                     )
+                            )
+                        .toList();
 
-        ApiError error = new ApiError(
-            Instant.now(),
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation Error",
-            "One or more fields are invalid.",
-            request.getRequestURI(),
-            fieldErrors
-        );
-
-        return ResponseEntity
-            .badRequest()
-            .body(error);
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "One or more fields are invalid.",
+                request,
+                fields
+                         );
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpected(
-        Exception exception,
-        HttpServletRequest request
-    ) {
+    @ExceptionHandler(
+            BadCredentialsException.class
+    )
+    public ResponseEntity<ApiError> handleBadCredentials(
+            BadCredentialsException exception,
+            HttpServletRequest request
+                                                        ) {
 
-        ApiError error = new ApiError(
-            Instant.now(),
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal Server Error",
-            "An unexpected error occurred.",
-            request.getRequestURI(),
-            List.of()
-        );
+        return buildError(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid email or password.",
+                request,
+                List.of()
+                         );
+    }
+
+    private ResponseEntity<ApiError> buildError(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request,
+            List<ApiError.FieldError> fields
+                                               ) {
+
+        ApiError error =
+                new ApiError(
+                        Instant.now(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        message,
+                        request.getRequestURI(),
+                        fields
+                );
 
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(error);
+                .status(status)
+                .body(error);
     }
 }
