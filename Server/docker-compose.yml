@@ -1,0 +1,26 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: wixblog-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: wixblog
+      POSTGRES_USER: wixblog
+      POSTGRES_PASSWORD: 123
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - wixblog_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wixblog -d wixblog"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  wixblog_postgres_data:
