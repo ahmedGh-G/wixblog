@@ -1,1 +1,130 @@
-/* You can add global styles to this file, and also import other style files */
+@layer theme, base, components, utilities;
+
+/* 1. INITIALIZE TAILWIND CSS V4 ENGINE WITH CUSTOM DESIGN TOKENS */
+@import "tailwindcss" layer(tailwindcss);
+
+@theme {
+  --font-serif: "GT-Super-Serif", "Charter", "Georgia", serif;
+  --font-sans: "Soehne", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  /* Your Brand Design Tokens */
+  --color-brand-bg: #ffffff;
+  --color-brand-surface: #f7f7f7;
+  --color-brand-primary: #191919;
+  --color-brand-accent: #1a8917;
+  --color-brand-accent-hover: #156f12;
+  --color-brand-muted: #6b6b6b;
+  --color-brand-border: #e6e6e6;
+}
+
+/* 2. IMPORT THE SPARTAN PRESET LOGIC */
+@import "@spartan-ng/brain/hlm-tailwind-preset.css";
+
+/* 3. MAP DESIGN TOKENS TO SPARTAN UI LIGHT THEME VARIABLES */
+:root {
+  color-scheme: light;
+  --radius: 0.625rem;
+
+  /* Backgrounds mapped to brand white/surface tokens */
+  --background: oklch(1 0 0);                 /* #FFFFFF */
+  --card: oklch(0.975 0 0);                   /* #F7F7F7 (Brand Surface) */
+  --popover: oklch(1 0 0);                    /* #FFFFFF */
+  --sidebar: oklch(0.975 0 0);                /* #F7F7F7 */
+
+  /* Foregrounds and Muted Text */
+  --foreground: oklch(0.145 0 0);             /* #191919 (Brand Primary text) */
+  --card-foreground: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --muted-foreground: oklch(0.518 0 0);       /* #6B6B6B (Brand Muted) */
+  --sidebar-foreground: oklch(0.145 0 0);
+
+  /* Primary Element mapped to #191919 */
+  --primary: oklch(0.145 0 0);                /* #191919 */
+  --primary-foreground: oklch(1 0 0);         /* White text on dark primary */
+  --sidebar-primary: oklch(0.145 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
+
+  /* Accent Element mapped to Medium green (#1A8917) */
+  --accent: oklch(0.573 0.176 142.49);        /* #1A8917 */
+  --accent-foreground: oklch(1 0 0);         /* White text on green accent */
+  --sidebar-accent: oklch(0.573 0.176 142.49);
+  --sidebar-accent-foreground: oklch(1 0 0);
+
+  /* Secondary / Control Backgrounds */
+  --secondary: oklch(0.975 0 0);              /* #F7F7F7 */
+  --secondary-foreground: oklch(0.145 0 0);   /* #191919 */
+  --muted: oklch(0.975 0 0);                  /* #F7F7F7 */
+
+  /* Borders & Inputs mapped to #E6E6E6 */
+  --border: oklch(0.922 0 0);                 /* #E6E6E6 */
+  --input: oklch(0.922 0 0);                  /* #E6E6E6 */
+  --sidebar-border: oklch(0.922 0 0);
+
+  /* Focus Rings & Alerts */
+  --ring: oklch(0.573 0.176 142.49);          /* Focus rings match accent green */
+  --sidebar-ring: oklch(0.573 0.176 142.49);
+  --destructive: oklch(0.577 0.245 27.325);
+}
+
+/* 4. MAP DESIGN TOKENS TO SPARTAN UI DARK THEME VARIABLES */
+:root.dark {
+  color-scheme: dark;
+
+  /* Inverted Backgrounds */
+  --background: oklch(0.145 0 0);             /* Dark background */
+  --card: oklch(0.205 0 0);
+  --popover: oklch(0.205 0 0);
+  --sidebar: oklch(0.205 0 0);
+
+  /* Inverted Foregrounds */
+  --foreground: oklch(0.985 0 0);             /* Near white text */
+  --card-foreground: oklch(0.985 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+
+  /* Primary Inverted (White/Light Gray background block) */
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.922 0 0);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+
+  /* Accent Element remains Green in dark mode */
+  --accent: oklch(0.573 0.176 142.49);        /* #1A8917 */
+  --accent-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.573 0.176 142.49);
+  --sidebar-accent-foreground: oklch(1 0 0);
+
+  /* Secondary controls for Dark mode */
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+
+  /* Borders & Focus */
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --ring: oklch(0.573 0.176 142.49);
+  --sidebar-ring: oklch(0.573 0.176 142.49);
+  --destructive: oklch(0.704 0.191 22.216);
+}
+
+/* 5. GLOBAL BASE UTILITIES */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 6. UTILITY COMPONENT CLASSES */
+@layer utilities {
+  .btn-ink-primary {
+    @apply px-5 py-2.5 bg-brand-accent text-white font-sans text-sm font-medium rounded-full hover:bg-black transition-all duration-200 cursor-pointer text-center block;
+  }
+  .btn-ink-secondary {
+    @apply px-5 py-2.5 bg-white border border-brand-border text-slate-800 font-sans text-sm font-medium rounded-full hover:border-brand-primary hover:text-black transition-all duration-200 cursor-pointer flex items-center justify-center gap-3 w-full text-center;
+  }
+}
