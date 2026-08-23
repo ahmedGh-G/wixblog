@@ -16,4 +16,7 @@ public interface UserRepository
     Optional<User> findByEmailIgnoreCase(String email);
 
     Optional<User> findByUsernameIgnoreCase(String username);
+
+
+
 }
