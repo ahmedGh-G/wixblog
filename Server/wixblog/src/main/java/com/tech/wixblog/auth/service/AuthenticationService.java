@@ -8,7 +8,9 @@ import com.tech.wixblog.common.exception.ResourceAlreadyExistsException;
 import com.tech.wixblog.security.JwtService;
 import com.tech.wixblog.user.domain.Role;
 import com.tech.wixblog.user.domain.User;
+import com.tech.wixblog.user.domain.UserProfile;
 import com.tech.wixblog.user.domain.UserStatus;
+import com.tech.wixblog.user.repository.UserProfileRepository;
 import com.tech.wixblog.user.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,14 +33,18 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    private final UserProfileRepository userProfileRepository;
+
     public AuthenticationService(
             UserRepository userRepository, JwtService jwtService,
-            PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager
+            PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+            UserProfileRepository userProfileRepository
                                 ) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.userProfileRepository = userProfileRepository;
     }
 
     public RegisterResponse register(
@@ -72,6 +78,16 @@ public class AuthenticationService {
         );
 
         User savedUser = userRepository.save(user);
+
+        UserProfile profile =
+                new UserProfile(
+                        savedUser,
+                        savedUser.getUsername()
+                );
+
+
+        userProfileRepository.save(profile);
+
 
         return RegisterResponse.from(savedUser);
     }
