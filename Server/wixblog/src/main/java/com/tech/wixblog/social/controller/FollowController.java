@@ -6,6 +6,7 @@ import com.tech.wixblog.social.dto.FollowStatusResponse;
 import com.tech.wixblog.social.dto.SocialStatsResponse;
 import com.tech.wixblog.social.dto.SocialUserResponse;
 import com.tech.wixblog.social.service.FollowService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class FollowController {
 
 
 
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/{userId}/follow")
     public ResponseEntity<FollowResponse> follow(
         Authentication authentication,
@@ -45,6 +48,7 @@ public class FollowController {
         );
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{userId}/follow")
     public ResponseEntity<FollowResponse> unfollow(
         Authentication authentication,
