@@ -1,7 +1,7 @@
 package com.tech.wixblog.content.controller;
 
 import com.tech.wixblog.content.domain.StoryStatus;
-import com.tech.wixblog.content.dto.CreateStoryRequest;
+
 import com.tech.wixblog.content.dto.StoryResponse;
 import com.tech.wixblog.content.dto.UpdateStoryRequest;
 import com.tech.wixblog.content.service.StoryService;
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,13 +29,12 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/stories")
+@RequiredArgsConstructor
 public class StoryController {
 
     private final StoryService storyService;
 
-    public StoryController(StoryService storyService) {
-        this.storyService = storyService;
-    }
+
 
     @Operation(
             summary = "Create a new story draft",
@@ -48,12 +48,16 @@ public class StoryController {
     @PostMapping
     public ResponseEntity<StoryResponse> createStory(
             Authentication authentication,
-            @Valid @RequestBody CreateStoryRequest request
+            @Valid @RequestBody com.wixblog.content.dto.CreateStoryRequest request
                                                     ) {
         var authorId = AuthenticatedUser.getId(authentication);
         StoryResponse response = storyService.createDraft(authorId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+
+
+
 
     @Operation(
             summary = "Update an existing story",
@@ -150,5 +154,34 @@ public class StoryController {
                                                            ) {
         UUID authorId = AuthenticatedUser.getId(authentication);
         return ResponseEntity.ok(storyService.getMyStories(authorId, status, pageable));
+    }
+
+    @Operation(
+            summary = "Get published stories",
+            description =
+                    "Returns a paginated list of published stories."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Stories retrieved successfully"
+            )
+    })
+    @GetMapping
+    public ResponseEntity<Page<StoryResponse>>
+    getPublishedStories(
+            @PageableDefault(
+                    size = 20,
+                    sort = "publishedAt",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+                       ) {
+
+        return ResponseEntity.ok(
+                storyService.getPublishedStories(
+                        pageable
+                                                )
+                                );
     }
 }

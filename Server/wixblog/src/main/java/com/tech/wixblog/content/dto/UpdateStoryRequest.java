@@ -2,6 +2,9 @@ package com.tech.wixblog.content.dto;
 
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+import java.util.Set;
+
 public record UpdateStoryRequest(
 
     @Size(
@@ -22,6 +25,10 @@ public record UpdateStoryRequest(
         max = 500,
         message = "Cover image URL cannot exceed 500 characters"
     )
-    String coverImageUrl
+    String coverImageUrl,
+
+    UUID categoryId,
+
+    Set<UUID> tagIds
 
 ) {}

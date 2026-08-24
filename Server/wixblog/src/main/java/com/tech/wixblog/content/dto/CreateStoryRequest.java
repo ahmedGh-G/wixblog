@@ -1,27 +1,25 @@
-package com.tech.wixblog.content.dto;
+package com.wixblog.content.dto;
 
 import jakarta.validation.constraints.Size;
 
+import java.util.Set;
+import java.util.UUID;
+
 public record CreateStoryRequest(
 
-    @Size(
-        max = 150,
-        message = "Title cannot exceed 150 characters"
-    )
-    String title,
+        @Size(max = 150)
+        String title,
 
-    @Size(
-        max = 300,
-        message = "Subtitle cannot exceed 300 characters"
-    )
-    String subtitle,
+        @Size(max = 300)
+        String subtitle,
 
-    String content,
+        String content,
 
-    @Size(
-        max = 500,
-        message = "Cover image URL cannot exceed 500 characters"
-    )
-    String coverImageUrl
+        @Size(max = 500)
+        String coverImageUrl,
+
+        UUID categoryId,
+
+        Set<UUID> tagIds
 
 ) {}

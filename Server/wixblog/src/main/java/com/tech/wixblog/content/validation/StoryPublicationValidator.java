@@ -8,24 +8,30 @@ import org.springframework.stereotype.Component;
 public class StoryPublicationValidator {
 
     public void validate(
-        Story story
-    ) {
+            Story story
+                        ) {
 
         if (isBlank(story.getTitle())) {
 
             throw new BusinessRuleException(
-                "A story must have a title before publishing."
+                    "A story must have a title before publishing."
             );
         }
 
         if (isBlank(story.getContent())) {
 
             throw new BusinessRuleException(
-                "A story must have content before publishing."
+                    "A story must have content before publishing."
+            );
+        }
+
+        if (story.getCategory() == null) {
+
+            throw new BusinessRuleException(
+                    "A category is required before publishing."
             );
         }
     }
-
     private boolean isBlank(
         String value
     ) {

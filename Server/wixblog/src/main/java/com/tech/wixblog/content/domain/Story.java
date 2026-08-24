@@ -7,6 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -91,6 +94,29 @@ public class Story {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    @Column(
+            name = "reading_time_minutes"
+    )
+    private Integer readingTimeMinutes;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "category_id"
+    )
+    private Category category;
+
+    @ManyToMany
+    @JoinTable(
+            name = "story_tags",
+            joinColumns = @JoinColumn(
+                    name = "story_id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "tag_id"
+            )
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     public Story(
         User author
@@ -140,10 +166,60 @@ public class Story {
         if (this.publishedAt == null) {
             this.publishedAt = Instant.now();
         }
+
+        this.readingTimeMinutes =
+                calculateReadingTime(
+                        this.content
+                                    );
+    }
+
+
+    private int calculateReadingTime(
+            String content
+                                    ) {
+
+        if (content == null ||
+                content.isBlank()) {
+
+            return 0;
+        }
+
+        int wordCount =
+                content.trim()
+                        .split("\\s+")
+                        .length;
+
+        return Math.max(
+                1,
+                (int) Math.ceil(
+                        wordCount / 200.0
+                               )
+                       );
     }
 
     public void archive() {
 
         this.status = StoryStatus.ARCHIVED;
+    }
+
+
+    public Set<Tag> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+    public void replaceTags(
+            Set<Tag> tags
+                           ) {
+
+        this.tags.clear();
+
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
+    }
+
+    public void assignCategory(
+            Category category
+                              ) {
+        this.category = category;
     }
 }

@@ -3,30 +3,35 @@ package com.tech.wixblog.content.dto;
 import com.tech.wixblog.content.domain.StoryStatus;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 public record StoryResponse(
 
-    UUID id,
+        UUID id,
 
-    UUID authorId,
+        UUID authorId,
 
-    String authorUsername,
+        String authorUsername,
 
-    String title,
+        String title,
 
-    String subtitle,
+        String subtitle,
 
-    String content,
+        String content,
 
-    String coverImageUrl,
+        String coverImageUrl,
 
-    StoryStatus status,
+        StoryStatus status,
 
-    Instant createdAt,
+        CategoryResponse category,
 
-    Instant updatedAt,
+        Set<TagResponse> tags,
 
-    Instant publishedAt
+        Instant readingTimeMinutes,
 
+
+        Instant updatedAt,
+
+        Instant publishedAt
 ) {}

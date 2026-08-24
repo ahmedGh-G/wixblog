@@ -2,12 +2,17 @@ package com.tech.wixblog.content.service;
 
 import com.tech.wixblog.common.exception.BusinessRuleException;
 import com.tech.wixblog.common.exception.ResourceNotFoundException;
+import com.tech.wixblog.content.domain.Category;
 import com.tech.wixblog.content.domain.Story;
 import com.tech.wixblog.content.domain.StoryStatus;
-import com.tech.wixblog.content.dto.CreateStoryRequest;
+import com.tech.wixblog.content.domain.Tag;
+import com.tech.wixblog.content.dto.CategoryResponse;
 import com.tech.wixblog.content.dto.StoryResponse;
+import com.tech.wixblog.content.dto.TagResponse;
 import com.tech.wixblog.content.dto.UpdateStoryRequest;
+import com.tech.wixblog.content.repository.CategoryRepository;
 import com.tech.wixblog.content.repository.StoryRepository;
+import com.tech.wixblog.content.repository.TagRepository;
 import com.tech.wixblog.content.validation.StoryPublicationValidator;
 import com.tech.wixblog.user.domain.User;
 import com.tech.wixblog.user.repository.UserRepository;
@@ -18,7 +23,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,11 +37,13 @@ public class StoryService {
     private final StoryRepository storyRepository;
     private final UserRepository userRepository;
     private final StoryPublicationValidator storyPublicationValidator;
+    private final CategoryRepository categoryRepository;
+    private final TagRepository tagRepository;
 
 
     public StoryResponse createDraft(
         UUID authorId,
-        CreateStoryRequest request
+        com.wixblog.content.dto.CreateStoryRequest request
     ) {
 
         User author =
@@ -53,6 +64,19 @@ public class StoryService {
             normalize(request.coverImageUrl())
         );
 
+        Category category =
+                resolveCategory(
+                        request.categoryId()
+                               );
+
+        Set<Tag> tags =
+                resolveTags(
+                        request.tagIds()
+                           );
+
+        story.assignCategory(category);
+        story.replaceTags(tags);
+
         Story saved =
             storyRepository.save(story);
 
@@ -60,21 +84,36 @@ public class StoryService {
     }
 
     private StoryResponse toResponse(
-        Story story
-    ) {
+            Story story
+                                    ) {
+
+        CategoryResponse category =
+                story.getCategory() == null
+                        ? null
+                        : CategoryResponse.from(
+                        story.getCategory()
+                                               );
+
+        Set<TagResponse> tags =
+                story.getTags()
+                        .stream()
+                        .map(TagResponse::from)
+                        .collect(Collectors.toSet());
 
         return new StoryResponse(
-            story.getId(),
-            story.getAuthor().getId(),
-            story.getAuthor().getUsername(),
-            story.getTitle(),
-            story.getSubtitle(),
-            story.getContent(),
-            story.getCoverImageUrl(),
-            story.getStatus(),
-            story.getCreatedAt(),
-            story.getUpdatedAt(),
-            story.getPublishedAt()
+                story.getId(),
+                story.getAuthor().getId(),
+                story.getAuthor().getUsername(),
+                story.getTitle(),
+                story.getSubtitle(),
+                story.getContent(),
+                story.getCoverImageUrl(),
+                story.getStatus(),
+                category,
+                tags,
+                story.getCreatedAt(),
+                story.getUpdatedAt(),
+                story.getPublishedAt()
         );
     }
 
@@ -130,6 +169,17 @@ public class StoryService {
                 normalize(request.coverImageUrl())
                            );
 
+        story.assignCategory(
+                resolveCategory(
+                        request.categoryId()
+                               )
+                            );
+
+        story.replaceTags(
+                resolveTags(
+                        request.tagIds()
+                           )
+                         );
         return toResponse(story);
     }
 
@@ -256,5 +306,60 @@ public class StoryService {
         return stories.map(
                 this::toResponse
                           );
+    }
+
+    private Category resolveCategory(
+            UUID categoryId
+                                    ) {
+
+        if (categoryId == null) {
+            return null;
+        }
+
+        return categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() ->
+                                     new ResourceNotFoundException(
+                                             "Category not found."
+                                     )
+                            );
+    }
+
+    private Set<Tag> resolveTags(
+            Set<UUID> tagIds
+                                ) {
+
+        if (tagIds == null ||
+                tagIds.isEmpty()) {
+
+            return new HashSet<>();
+        }
+
+        List<Tag> tags =
+                tagRepository.findAllById(tagIds);
+
+        if (tags.size() != tagIds.size()) {
+
+            throw new ResourceNotFoundException(
+                    "One or more tags were not found."
+            );
+        }
+
+        return new HashSet<>(tags);
+    }
+
+
+
+    @Transactional(readOnly = true)
+    public Page<StoryResponse> getPublishedStories(
+            Pageable pageable
+                                                  ) {
+
+        return storyRepository
+                .findByStatus(
+                        StoryStatus.PUBLISHED,
+                        pageable
+                             )
+                .map(this::toResponse);
     }
 }
