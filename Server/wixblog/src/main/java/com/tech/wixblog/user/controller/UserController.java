@@ -5,6 +5,7 @@ import com.tech.wixblog.user.dto.PublicUserProfileResponse;
 import com.tech.wixblog.user.dto.UpdateProfileRequest;
 import com.tech.wixblog.user.dto.UserMeResponse;
 import com.tech.wixblog.user.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
