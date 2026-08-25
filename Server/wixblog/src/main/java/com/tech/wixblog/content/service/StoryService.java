@@ -6,10 +6,9 @@ import com.tech.wixblog.content.domain.Category;
 import com.tech.wixblog.content.domain.Story;
 import com.tech.wixblog.content.domain.StoryStatus;
 import com.tech.wixblog.content.domain.Tag;
-import com.tech.wixblog.content.dto.CategoryResponse;
 import com.tech.wixblog.content.dto.StoryResponse;
-import com.tech.wixblog.content.dto.TagResponse;
 import com.tech.wixblog.content.dto.UpdateStoryRequest;
+import com.tech.wixblog.content.mapper.StoryMapper;
 import com.tech.wixblog.content.repository.CategoryRepository;
 import com.tech.wixblog.content.repository.StoryRepository;
 import com.tech.wixblog.content.repository.TagRepository;
@@ -26,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,6 +35,7 @@ public class StoryService {
     private final StoryPublicationValidator storyPublicationValidator;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
+    private final StoryMapper storyMapper;
 
     public StoryResponse createDraft (
             UUID authorId,
@@ -67,40 +66,7 @@ public class StoryService {
                            );
         story.assignCategory(category);
         story.replaceTags(tags);
-        Story saved =
-                storyRepository.save(story);
-        return toResponse(saved);
-    }
-
-    private StoryResponse toResponse (
-            Story story
-                                     ) {
-        CategoryResponse category =
-                story.getCategory() == null
-                        ? null
-                        : CategoryResponse.from(
-                        story.getCategory()
-                                               );
-        Set<TagResponse> tags =
-                story.getTags()
-                        .stream()
-                        .map(TagResponse::from)
-                        .collect(Collectors.toSet());
-        return new StoryResponse(
-                story.getId(),
-                story.getAuthor().getId(),
-                story.getAuthor().getUsername(),
-                story.getTitle(),
-                story.getSubtitle(),
-                story.getContent(),
-                story.getCoverImageUrl(),
-                story.getStatus(),
-                category,
-                tags,
-                story.getCreatedAt(),
-                story.getUpdatedAt(),
-                story.getPublishedAt()
-        );
+        return storyMapper.toResponse(storyRepository.save(story));
     }
 
     private String normalize (
@@ -155,7 +121,7 @@ public class StoryService {
                         request.tagIds()
                            )
                          );
-        return toResponse(story);
+        return storyMapper.toResponse(story);
     }
 
     @Transactional
@@ -178,7 +144,7 @@ public class StoryService {
                 story
                                           );
         story.publish();
-        return toResponse(story);
+        return storyMapper.toResponse(story);
     }
 
     @Transactional(readOnly = true)
@@ -211,7 +177,7 @@ public class StoryService {
                     "Story not found."
             );
         }
-        return toResponse(story);
+        return storyMapper.toResponse(story);
     }
 
     @Transactional
@@ -248,17 +214,15 @@ public class StoryService {
                                                   );
 
         } else {
-            stories =
-                    storyRepository
-                            .findByAuthorIdAndStatus(
-                                    authorId,
-                                    status,
-                                    pageable
-                                                    );
+            stories = storyRepository
+                    .findByAuthorIdAndStatus(
+                            authorId,
+                            status,
+                            pageable
+                                            );
+
         }
-        return stories.map(
-                this::toResponse
-                          );
+        return stories.map(storyMapper::toResponse);
     }
 
     private Category resolveCategory (
@@ -302,7 +266,7 @@ public class StoryService {
                         StoryStatus.PUBLISHED,
                         pageable
                              )
-                .map(this::toResponse);
+                .map(storyMapper::toResponse);
     }
 
     @Transactional(readOnly = true)

@@ -1,16 +1,14 @@
 package com.tech.wixblog.social.dto;
 
+import com.tech.wixblog.user.dto.PublicUserResponse;
+
 import java.time.Instant;
 import java.util.UUID;
 
 public record CommentProjection(
         UUID id,
         String content,
-        UUID authorId,
-        String username,
-        String displayName,
-        String bio,
-        String avatarUrl,
+        PublicUserResponse author,
         Instant createdAt,
         Instant updatedAt
 ) {

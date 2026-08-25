@@ -7,31 +7,18 @@ import java.util.Set;
 import java.util.UUID;
 
 public record StoryResponse(
-
         UUID id,
-
         UUID authorId,
-
         String authorUsername,
-
         String title,
-
         String subtitle,
-
         String content,
-
         String coverImageUrl,
-
         StoryStatus status,
-
         CategoryResponse category,
-
         Set<TagResponse> tags,
-
-        Instant readingTimeMinutes,
-
-
+        Integer readingTimeMinutes,
         Instant updatedAt,
-
         Instant publishedAt
-) {}
+) {
+}
