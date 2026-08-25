@@ -1,7 +1,9 @@
 package com.tech.wixblog.user.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -24,56 +26,53 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
     @Column(
             nullable = false,
             length = 255
     )
     private String email;
-
     @Column(
             nullable = false,
             length = 30
     )
     private String username;
-
     @Column(
             name = "password_hash",
             nullable = false,
             length = 255
     )
     private String passwordHash;
-
     @Enumerated(EnumType.STRING)
     @Column(
             nullable = false,
             length = 30
     )
     private Role role;
-
     @Enumerated(EnumType.STRING)
     @Column(
             nullable = false,
             length = 30
     )
     private UserStatus status;
-
     @Column(
             name = "created_at",
             nullable = false,
             updatable = false
     )
     private Instant createdAt;
-
     @Column(
             name = "updated_at",
             nullable = false
     )
     private Instant updatedAt;
+    @OneToOne(
+            mappedBy = "user",
+            fetch = FetchType.LAZY
+    )
+    private UserProfile profile;
 
     public User (String email, String username, String passwordHash, Role role, UserStatus status) {
         this.email = email;
@@ -83,16 +82,14 @@ public class User {
         this.status = status;
     }
 
-
-
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate () {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
     }
 
     @PreUpdate
-    protected void onUpdate(){
+    protected void onUpdate () {
         this.updatedAt = Instant.now();
     }
 }
