@@ -362,4 +362,15 @@ public class StoryService {
                              )
                 .map(this::toResponse);
     }
+
+    @Transactional(readOnly = true)
+    public long countPublishedStories(
+            UUID categoryId
+                                     ) {
+
+        return storyRepository
+                .countPublishedStories(
+                        categoryId
+                                      );
+    }
 }
