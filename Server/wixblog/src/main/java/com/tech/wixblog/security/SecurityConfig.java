@@ -29,7 +29,6 @@ public class SecurityConfig {
                                                    SessionCreationPolicy.STATELESS
                                                                         )
                                   )
-
                 .authorizeHttpRequests(auth -> auth
                                                .requestMatchers(
                                                        "/api/v1/auth/register",
@@ -38,20 +37,23 @@ public class SecurityConfig {
                                                        "/swagger-ui/**",
                                                        "/swagger-ui.html"
                                                                ).permitAll()
+                                               .requestMatchers(
+                                                       "/api/v1/search/**",
+                                                       "/api/v1/tags/**",
+                                                       "/api/v1/categories/**"
+                                                               )
+                                               .permitAll()
                                                .requestMatchers(HttpMethod.GET, "/api/v1/stories/me").authenticated()
                                                .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/users/**",
                                                                 "/api/v1/stories/*").permitAll()
-
                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                                .anyRequest().authenticated()
-
                                       )
                 .oauth2ResourceServer(oauth2 ->
                                               oauth2.jwt(jwt -> {
                                               })
                                      );
-
         return http.build();
     }
 }
