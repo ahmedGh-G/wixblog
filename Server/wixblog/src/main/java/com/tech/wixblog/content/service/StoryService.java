@@ -19,7 +19,6 @@ import com.tech.wixblog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,73 +32,60 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class StoryService {
-
     private final StoryRepository storyRepository;
     private final UserRepository userRepository;
     private final StoryPublicationValidator storyPublicationValidator;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
 
-
-    public StoryResponse createDraft(
-        UUID authorId,
-        com.wixblog.content.dto.CreateStoryRequest request
-    ) {
-
+    public StoryResponse createDraft (
+            UUID authorId,
+            com.wixblog.content.dto.CreateStoryRequest request
+                                     ) {
         User author =
-            userRepository.findById(authorId)
-                .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User not found."
-                    )
-                );
-
+                userRepository.findById(authorId)
+                        .orElseThrow(() ->
+                                             new ResourceNotFoundException(
+                                                     "User not found."
+                                             )
+                                    );
         Story story =
-            new Story(author);
-
+                new Story(author);
         story.updateContent(
-            normalize(request.title()),
-            normalize(request.subtitle()),
-            request.content(),
-            normalize(request.coverImageUrl())
-        );
-
+                normalize(request.title()),
+                normalize(request.subtitle()),
+                request.content(),
+                normalize(request.coverImageUrl())
+                           );
         Category category =
                 resolveCategory(
                         request.categoryId()
                                );
-
         Set<Tag> tags =
                 resolveTags(
                         request.tagIds()
                            );
-
         story.assignCategory(category);
         story.replaceTags(tags);
-
         Story saved =
-            storyRepository.save(story);
-
+                storyRepository.save(story);
         return toResponse(saved);
     }
 
-    private StoryResponse toResponse(
+    private StoryResponse toResponse (
             Story story
-                                    ) {
-
+                                     ) {
         CategoryResponse category =
                 story.getCategory() == null
                         ? null
                         : CategoryResponse.from(
                         story.getCategory()
                                                );
-
         Set<TagResponse> tags =
                 story.getTags()
                         .stream()
                         .map(TagResponse::from)
                         .collect(Collectors.toSet());
-
         return new StoryResponse(
                 story.getId(),
                 story.getAuthor().getId(),
@@ -117,31 +103,25 @@ public class StoryService {
         );
     }
 
-    private String normalize(
-        String value
-    ) {
-
+    private String normalize (
+            String value
+                             ) {
         if (value == null) {
             return null;
         }
-
         String normalized =
-            value.trim();
-
+                value.trim();
         return normalized.isBlank()
-            ? null
-            : normalized;
+                ? null
+                : normalized;
     }
 
-
-
     @Transactional
-    public StoryResponse updateStory(
+    public StoryResponse updateStory (
             UUID authorId,
             UUID storyId,
             UpdateStoryRequest request
-                                    ) {
-
+                                     ) {
         Story story =
                 storyRepository
                         .findByIdAndAuthorId(
@@ -153,28 +133,23 @@ public class StoryService {
                                                      "Story not found."
                                              )
                                     );
-
         if (story.getStatus() ==
                 StoryStatus.ARCHIVED) {
-
             throw new BusinessRuleException(
                     "Archived stories cannot be edited."
             );
         }
-
         story.updateContent(
                 normalize(request.title()),
                 normalize(request.subtitle()),
                 request.content(),
                 normalize(request.coverImageUrl())
                            );
-
         story.assignCategory(
                 resolveCategory(
                         request.categoryId()
                                )
                             );
-
         story.replaceTags(
                 resolveTags(
                         request.tagIds()
@@ -184,11 +159,10 @@ public class StoryService {
     }
 
     @Transactional
-    public StoryResponse publishStory(
+    public StoryResponse publishStory (
             UUID authorId,
             UUID storyId
-                                     ) {
-
+                                      ) {
         Story story =
                 storyRepository
                         .findByIdAndAuthorId(
@@ -200,23 +174,18 @@ public class StoryService {
                                                      "Story not found."
                                              )
                                     );
-
         storyPublicationValidator.validate(
                 story
                                           );
-
         story.publish();
-
         return toResponse(story);
     }
 
-
     @Transactional(readOnly = true)
-    public StoryResponse getStory(
+    public StoryResponse getStory (
             UUID storyId,
             UUID viewerId
-                                 ) {
-
+                                  ) {
         Story story =
                 storyRepository.findById(storyId)
                         .orElseThrow(() ->
@@ -224,41 +193,32 @@ public class StoryService {
                                                      "Story not found."
                                              )
                                     );
-
         boolean owner =
-                viewerId != null &&
-                        story.getAuthor()
-                                .getId()
-                                .equals(viewerId);
-
+                story.getAuthor()
+                        .getId()
+                        .equals(viewerId);
         if (story.getStatus() ==
                 StoryStatus.DRAFT &&
                 !owner) {
-
             throw new ResourceNotFoundException(
                     "Story not found."
             );
         }
-
         if (story.getStatus() ==
                 StoryStatus.ARCHIVED &&
                 !owner) {
-
             throw new ResourceNotFoundException(
                     "Story not found."
             );
         }
-
         return toResponse(story);
     }
 
-
     @Transactional
-    public void archiveStory(
+    public void archiveStory (
             UUID authorId,
             UUID storyId
-                            ) {
-
+                             ) {
         Story story =
                 storyRepository
                         .findByIdAndAuthorId(
@@ -270,22 +230,17 @@ public class StoryService {
                                                      "Story not found."
                                              )
                                     );
-
         story.archive();
     }
 
-
     @Transactional(readOnly = true)
-    public Page<StoryResponse> getMyStories(
+    public Page<StoryResponse> getMyStories (
             UUID authorId,
             StoryStatus status,
             Pageable pageable
-                                           ) {
-
+                                            ) {
         Page<Story> stories;
-
         if (status == null) {
-
             stories =
                     storyRepository.findByAuthorId(
                             authorId,
@@ -293,7 +248,6 @@ public class StoryService {
                                                   );
 
         } else {
-
             stories =
                     storyRepository
                             .findByAuthorIdAndStatus(
@@ -302,20 +256,17 @@ public class StoryService {
                                     pageable
                                                     );
         }
-
         return stories.map(
                 this::toResponse
                           );
     }
 
-    private Category resolveCategory(
+    private Category resolveCategory (
             UUID categoryId
-                                    ) {
-
+                                     ) {
         if (categoryId == null) {
             return null;
         }
-
         return categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() ->
@@ -325,36 +276,27 @@ public class StoryService {
                             );
     }
 
-    private Set<Tag> resolveTags(
+    private Set<Tag> resolveTags (
             Set<UUID> tagIds
-                                ) {
-
+                                 ) {
         if (tagIds == null ||
                 tagIds.isEmpty()) {
-
             return new HashSet<>();
         }
-
         List<Tag> tags =
                 tagRepository.findAllById(tagIds);
-
         if (tags.size() != tagIds.size()) {
-
             throw new ResourceNotFoundException(
                     "One or more tags were not found."
             );
         }
-
         return new HashSet<>(tags);
     }
 
-
-
     @Transactional(readOnly = true)
-    public Page<StoryResponse> getPublishedStories(
+    public Page<StoryResponse> getPublishedStories (
             Pageable pageable
-                                                  ) {
-
+                                                   ) {
         return storyRepository
                 .findByStatus(
                         StoryStatus.PUBLISHED,
@@ -364,10 +306,9 @@ public class StoryService {
     }
 
     @Transactional(readOnly = true)
-    public long countPublishedStories(
+    public long countPublishedStories (
             UUID categoryId
-                                     ) {
-
+                                      ) {
         return storyRepository
                 .countPublishedStories(
                         categoryId
