@@ -36,11 +36,13 @@ public interface CommentRepository
                 SELECT new com.tech.wixblog.social.dto.CommentProjection(
                     c.id,
                     c.content,
-                    u.id,
-                    u.username,
-                    p.displayName,
-                    p.bio,
-                    p.avatarUrl,
+                    new com.tech.wixblog.user.dto.PublicUserResponse(
+                                            u.id,
+                                            u.username,
+                                            p.displayName,
+                                            p.bio,
+                                            p.avatarUrl
+                                        ),
                     c.createdAt,
                     c.updatedAt
                 )
@@ -59,11 +61,13 @@ public interface CommentRepository
                 SELECT new com.tech.wixblog.social.dto.CommentProjection(
                     c.id,
                     c.content,
-                    u.id,
-                    u.username,
-                    p.displayName,
-                    p.bio,
-                    p.avatarUrl,
+                    new com.tech.wixblog.user.dto.PublicUserResponse(
+                                            u.id,
+                                            u.username,
+                                            p.displayName,
+                                            p.bio,
+                                            p.avatarUrl
+                                        ),
                     c.createdAt,
                     c.updatedAt
                 )

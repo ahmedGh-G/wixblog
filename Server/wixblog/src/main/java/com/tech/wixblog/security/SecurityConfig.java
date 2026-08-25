@@ -51,7 +51,8 @@ public class SecurityConfig {
                                                .requestMatchers(HttpMethod.GET, "/api/v1/stories/me").authenticated()
                                                .requestMatchers(HttpMethod.GET,
                                                                 "/api/v1/users/**",
-                                                                "/api/v1/stories/*").permitAll()
+                                                                "/api/v1/stories/*",
+                                                                "/api/v1/feed/following").permitAll()
                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                                .anyRequest().authenticated()
                                       )
