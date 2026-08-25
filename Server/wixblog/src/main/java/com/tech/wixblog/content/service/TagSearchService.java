@@ -1,7 +1,9 @@
 package com.tech.wixblog.content.service;
 
-import com.tech.wixblog.content.dto.TagSearchResponse;
+import com.tech.wixblog.content.dto.TagResponse;
+import com.tech.wixblog.content.mapper.TagMapper;
 import com.tech.wixblog.content.repository.TagRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,24 +13,20 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TagSearchService {
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
 
-    public TagSearchService (
-            TagRepository tagRepository
-                            ) {
-        this.tagRepository = tagRepository;
-    }
-
-    public List<TagSearchResponse> searchForGlobalSearch (
+    public List<TagResponse> searchForGlobalSearch (
             String query,
             int limit
-                                                         ) {
+                                                   ) {
         Pageable pageable = PageRequest.of(0, limit);
         return tagRepository
                 .searchTags(query, pageable)
                 .stream()
-                .map(TagSearchResponse::from)
+                .map(tagMapper::toResponse)
                 .toList();
     }
 }

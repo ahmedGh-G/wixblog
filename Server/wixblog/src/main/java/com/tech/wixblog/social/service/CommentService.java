@@ -110,11 +110,11 @@ public class CommentService {
                                        ) {
         PublicUserResponse author =
                 new PublicUserResponse(
-                        projection.authorId(),
-                        projection.username(),
-                        projection.displayName(),
-                        projection.bio(),
-                        projection.avatarUrl()
+                        projection.id(),
+                        projection.author().username(),
+                        projection.author().displayName(),
+                        projection.author().bio(),
+                        projection.author().avatarUrl()
                 );
         return new CommentResponse(
                 projection.id(),

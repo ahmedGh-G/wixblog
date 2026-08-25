@@ -19,54 +19,20 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final FollowRepository followRepository;
 
-
-
-    public UserMeResponse getCurrentUser(
-        UUID userId
-    ) {
-
+    public UserMeResponse getCurrentUser (
+            UUID userId
+                                         ) {
         User user =
-            userRepository.findById(userId)
-                .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User not found."
-                    )
-                );
-
-        UserProfile profile =
-            userProfileRepository
-                .findByUserId(userId)
-                .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User profile not found."
-                    )
-                );
-
-        return new UserMeResponse(
-            user.getId(),
-            user.getEmail(),
-            user.getUsername(),
-            profile.getDisplayName(),
-            profile.getBio(),
-            profile.getAvatarUrl(),
-            user.getRole(),
-            user.getStatus()
-        );
-    }
-
-
-
-    @Transactional
-    public UserMeResponse updateProfile(
-            UUID userId,
-            UpdateProfileRequest request
-                                       ) {
-
+                userRepository.findById(userId)
+                        .orElseThrow(() ->
+                                             new ResourceNotFoundException(
+                                                     "User not found."
+                                             )
+                                    );
         UserProfile profile =
                 userProfileRepository
                         .findByUserId(userId)
@@ -75,55 +41,92 @@ public class UserService {
                                                      "User profile not found."
                                              )
                                     );
+        return new UserMeResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getUsername(),
+                profile.getDisplayName(),
+                profile.getBio(),
+                profile.getAvatarUrl(),
+                user.getRole(),
+                user.getStatus()
+        );
+    }
 
+
+   /* public UserMeResponse getCurrentUser (
+            UUID userId
+                                         ) {
+        User user =
+                userRepository.findById(userId)
+                        .orElseThrow(() ->
+                                             new ResourceNotFoundException(
+                                                     "User not found."
+                                             )
+                                    );
+        UserProfile profile =
+                userProfileRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                             new ResourceNotFoundException(
+                                                     "User profile not found."
+                                             )
+                                    );
+        return userMapper.toMeResponse(user);
+    }*/
+
+    @Transactional
+    public UserMeResponse updateProfile (
+            UUID userId,
+            UpdateProfileRequest request
+                                        ) {
+        UserProfile profile =
+                userProfileRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                             new ResourceNotFoundException(
+                                                     "User profile not found."
+                                             )
+                                    );
         profile.update(
                 request.displayName().trim(),
                 normalizeBio(request.bio()),
                 normalizeAvatarUrl(request.avatarUrl())
                       );
-
         return getCurrentUser(userId);
     }
 
-    private String normalizeBio(
+    private String normalizeBio (
             String bio
-                               ) {
-
+                                ) {
         if (bio == null) {
             return null;
         }
-
         String normalized =
                 bio.trim();
-
         return normalized.isBlank()
                 ? null
                 : normalized;
     }
 
-    private String normalizeAvatarUrl(
+    private String normalizeAvatarUrl (
             String avatarUrl
-                                     ) {
-
+                                      ) {
         if (avatarUrl == null) {
             return null;
         }
-
         String normalized =
                 avatarUrl.trim();
-
         return normalized.isBlank()
                 ? null
                 : normalized;
     }
-
 
     @Transactional(readOnly = true)
     public PublicUserProfileResponse getPublicProfile (
             String username,
             UUID viewerId
                                                       ) {
-
         User user =
                 userRepository
                         .findByUsernameIgnoreCase(username)
@@ -132,7 +135,6 @@ public class UserService {
                                                      "User not found."
                                              )
                                     );
-
         UserProfile profile =
                 userProfileRepository
                         .findByUserId(user.getId())
@@ -141,15 +143,12 @@ public class UserService {
                                                      "User profile not found."
                                              )
                                     );
-
         long followersCount =
                 followRepository
                         .countByFollowingId(user.getId());
-
         long followingCount =
                 followRepository
                         .countByFollowerId(user.getId());
-
         boolean following =
                 viewerId != null &&
                         followRepository
@@ -157,7 +156,6 @@ public class UserService {
                                         viewerId,
                                         user.getId()
                                                                  );
-
         return new PublicUserProfileResponse(
                 user.getId(),
                 user.getUsername(),
@@ -169,7 +167,6 @@ public class UserService {
                 following
         );
     }
-
 
 
 }
