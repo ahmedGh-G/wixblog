@@ -5,8 +5,12 @@ import com.tech.wixblog.content.dto.StorySearchResponse;
 import com.tech.wixblog.content.service.StorySearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Tag(name = "Story search Api",
+     description = "Endpoints for Stories search based")
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
 public class StorySearchController {
     private final StorySearchService searchService;
@@ -38,18 +44,15 @@ public class StorySearchController {
             UUID categoryId,
             @RequestParam(required = false)
             String tag,
-            @RequestParam(defaultValue = "0")
-            int page,
-            @RequestParam(defaultValue = "20")
-            int size,
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
             String sort) {
         StorySearchRequest request =
                 new StorySearchRequest(
                         q,
                         categoryId,
                         tag,
-                        page,
-                        size,
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
                         sort
                 );
         return ResponseEntity.ok(

@@ -7,7 +7,9 @@ import com.tech.wixblog.social.dto.SocialStatsResponse;
 import com.tech.wixblog.social.dto.SocialUserResponse;
 import com.tech.wixblog.social.service.FollowService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,67 +20,60 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-
+@Tag(name = "Social engine Manager",
+     description = "Endpoints for social users ")
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class FollowController {
-
     private final FollowService followService;
-
-
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/{userId}/follow")
-    public ResponseEntity<FollowResponse> follow(
-        Authentication authentication,
-        @PathVariable UUID userId
-    ) {
-
+    public ResponseEntity<FollowResponse> follow (
+            Authentication authentication,
+            @PathVariable UUID userId
+                                                 ) {
         UUID followerId =
-            AuthenticatedUser.getId(
-                authentication
-            );
-
+                AuthenticatedUser.getId(
+                        authentication
+                                       );
         return ResponseEntity.ok(
-            followService.follow(
-                followerId,
-                userId
-            )
-        );
+                followService.follow(
+                        followerId,
+                        userId
+                                    )
+                                );
     }
 
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{userId}/follow")
-    public ResponseEntity<FollowResponse> unfollow(
-        Authentication authentication,
-        @PathVariable UUID userId
-    ) {
-
+    public ResponseEntity<FollowResponse> unfollow (
+            Authentication authentication,
+            @PathVariable UUID userId
+                                                   ) {
         UUID followerId =
-            AuthenticatedUser.getId(
-                authentication
-            );
-
+                AuthenticatedUser.getId(
+                        authentication
+                                       );
         return ResponseEntity.ok(
-            followService.unfollow(
-                followerId,
-                userId
-            )
-        );
+                followService.unfollow(
+                        followerId,
+                        userId
+                                      )
+                                );
     }
 
     @GetMapping("/{userId}/followers")
     public ResponseEntity<Page<SocialUserResponse>> getFollowers (
             @PathVariable UUID userId,
-            @PageableDefault(
+            @ParameterObject @PageableDefault(
                     size = 20,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             )
             Pageable pageable
                                                                  ) {
-
         return ResponseEntity.ok(
                 followService.getFollowers(
                         userId,
@@ -88,16 +83,15 @@ public class FollowController {
     }
 
     @GetMapping("/{userId}/following")
-    public ResponseEntity<Page<SocialUserResponse>> getFollowing(
+    public ResponseEntity<Page<SocialUserResponse>> getFollowing (
             @PathVariable UUID userId,
-            @PageableDefault(
+            @ParameterObject @PageableDefault(
                     size = 20,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             )
             Pageable pageable
-                                                                ) {
-
+                                                                 ) {
         return ResponseEntity.ok(
                 followService.getFollowing(
                         userId,
@@ -111,10 +105,8 @@ public class FollowController {
             Authentication authentication,
             @PathVariable UUID userId
                                                                 ) {
-
         UUID currentUserId =
                 AuthenticatedUser.getId(authentication);
-
         return ResponseEntity.ok(
                 followService.getFollowStatus(
                         currentUserId,
@@ -123,12 +115,10 @@ public class FollowController {
                                 );
     }
 
-
     @GetMapping("/{userId}/social-stats")
     public ResponseEntity<SocialStatsResponse> getSocialStats (
             @PathVariable UUID userId
                                                               ) {
-
         return ResponseEntity.ok(
                 followService.getSocialStats(userId)
                                 );

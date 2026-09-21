@@ -101,6 +101,13 @@ public class Story {
             )
     )
     private Set<Tag> tags = new HashSet<>();
+    @Column(
+            name = "featured",
+            nullable = false
+    )
+    private boolean featured = false;
+    @Column(name = "featured_at")
+    private Instant featuredAt;
 
     public Story (
             User author
@@ -189,5 +196,15 @@ public class Story {
             Category category
                                ) {
         this.category = category;
+    }
+
+    public void feature () {
+        this.featured = true;
+        this.featuredAt = Instant.now();
+    }
+
+    public void unfeature () {
+        this.featured = false;
+        this.featuredAt = null;
     }
 }
