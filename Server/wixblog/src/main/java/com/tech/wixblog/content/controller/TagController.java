@@ -8,15 +8,20 @@ import com.tech.wixblog.content.service.StorySearchService;
 import com.tech.wixblog.content.service.TagService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Tag Manger",
+                                        description = "Endpoints for managing Stories Tags")
 @RestController
 @SecurityRequirement(name = "bearerAuth")
-@RequestMapping("/api/v1/tags")
+@RequestMapping("/tags")
 @RequiredArgsConstructor
 public class TagController {
     private final TagService tagService;
@@ -42,10 +47,7 @@ public class TagController {
     public ResponseEntity<Page<StorySearchResponse>>
     getTagStories (
             @PathVariable String slug,
-            @RequestParam(defaultValue = "0")
-            int page,
-            @RequestParam(defaultValue = "20")
-            int size
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable
                   ) {
         Tag tag =
                 tagService.getEntityBySlug(slug);
@@ -54,8 +56,8 @@ public class TagController {
                         null,
                         null,
                         tag.getSlug(),
-                        page,
-                        size,
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
                         "latest"
                 );
         return ResponseEntity.ok(
