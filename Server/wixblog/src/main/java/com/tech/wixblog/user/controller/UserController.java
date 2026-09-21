@@ -4,9 +4,9 @@ import com.tech.wixblog.security.AuthenticatedUser;
 import com.tech.wixblog.user.dto.PublicUserProfileResponse;
 import com.tech.wixblog.user.dto.UpdateProfileRequest;
 import com.tech.wixblog.user.dto.UserMeResponse;
-import com.tech.wixblog.user.service.UserSearchService;
 import com.tech.wixblog.user.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Tag(name = "User Manager",
+     description = "Endpoints for managing users")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserSearchService userSearchService;
 
     @GetMapping("/me")
     public ResponseEntity<UserMeResponse> getCurrentUser (

@@ -6,6 +6,7 @@ import com.tech.wixblog.social.dto.CreateCommentRequest;
 import com.tech.wixblog.social.dto.UpdateCommentRequest;
 import com.tech.wixblog.social.service.CommentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Tag(name = "Comment Manger",
+     description = "Endpoints for managing Stories comments")
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 public class CommentController {

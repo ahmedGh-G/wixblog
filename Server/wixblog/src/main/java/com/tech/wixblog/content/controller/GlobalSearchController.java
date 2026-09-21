@@ -4,18 +4,24 @@ import com.tech.wixblog.content.dto.GlobalSearchResponse;
 import com.tech.wixblog.content.service.GlobalSearchService;
 import com.tech.wixblog.user.dto.PublicUserResponse;
 import com.tech.wixblog.user.service.UserSearchService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Global Search engine",
+     description = "Endpoints for system global search engine")
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
-public class DiscoveryController {
+public class GlobalSearchController {
     private final GlobalSearchService globalSearchService;
     private final UserSearchService userSearchService;
 
@@ -32,16 +38,13 @@ public class DiscoveryController {
     public ResponseEntity<Page<PublicUserResponse>> searchUsers (
             @RequestParam
             String q,
-            @RequestParam(defaultValue = "0")
-            int page,
-            @RequestParam(defaultValue = "20")
-            int size
+            @ParameterObject @PageableDefault(size = 20) Pageable pageable
                                                                 ) {
         return ResponseEntity.ok(
                 userSearchService.search(
                         q,
-                        page,
-                        size
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
                                         )
                                 );
     }

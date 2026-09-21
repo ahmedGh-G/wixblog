@@ -1,22 +1,22 @@
 package com.tech.wixblog.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.authentication.BadCredentialsException;
-
 import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(
             ResourceAlreadyExistsException.class
     )
@@ -24,7 +24,6 @@ public class GlobalExceptionHandler {
             ResourceAlreadyExistsException exception,
             HttpServletRequest request
                                                    ) {
-
         return buildError(
                 HttpStatus.CONFLICT,
                 exception.getMessage(),
@@ -36,11 +35,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(
             MethodArgumentNotValidException.class
     )
-    public ResponseEntity<ApiError> handleValidation(
+    public ResponseEntity<ApiError> handleValidation (
             MethodArgumentNotValidException exception,
             HttpServletRequest request
-                                                    ) {
-
+                                                     ) {
         List<ApiError.FieldError> fields =
                 exception.getBindingResult()
                         .getFieldErrors()
@@ -52,7 +50,6 @@ public class GlobalExceptionHandler {
                                      )
                             )
                         .toList();
-
         return buildError(
                 HttpStatus.BAD_REQUEST,
                 "One or more fields are invalid.",
@@ -64,11 +61,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(
             BadCredentialsException.class
     )
-    public ResponseEntity<ApiError> handleBadCredentials(
+    public ResponseEntity<ApiError> handleBadCredentials (
             BadCredentialsException exception,
             HttpServletRequest request
-                                                        ) {
-
+                                                         ) {
         return buildError(
                 HttpStatus.UNAUTHORIZED,
                 "Invalid email or password.",
@@ -77,13 +73,12 @@ public class GlobalExceptionHandler {
                          );
     }
 
-    private ResponseEntity<ApiError> buildError(
+    private ResponseEntity<ApiError> buildError (
             HttpStatus status,
             String message,
             HttpServletRequest request,
             List<ApiError.FieldError> fields
-                                               ) {
-
+                                                ) {
         ApiError error =
                 new ApiError(
                         Instant.now(),
@@ -93,9 +88,18 @@ public class GlobalExceptionHandler {
                         request.getRequestURI(),
                         fields
                 );
-
         return ResponseEntity
                 .status(status)
                 .body(error);
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidSortProperty (Exception ex) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", "Invalid sorting property provided.");
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
