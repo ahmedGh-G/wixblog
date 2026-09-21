@@ -36,24 +36,26 @@ public class SecurityConfig {
                                   )
                 .authorizeHttpRequests(auth -> auth
                                                .requestMatchers(
-                                                       "/api/v1/auth/register",
-                                                       "/api/v1/auth/login",
+                                                       "/auth/register",
+                                                       "/auth/login",
                                                        "/v3/api-docs/**",
                                                        "/swagger-ui/**",
                                                        "/swagger-ui.html"
                                                                ).permitAll()
                                                .requestMatchers(
-                                                       "/api/v1/search/**",
-                                                       "/api/v1/tags/**",
-                                                       "/api/v1/categories/**"
+                                                       "/search/**",
+                                                       "/tags/**",
+                                                       "/categories/**"
                                                                )
                                                .permitAll()
-                                               .requestMatchers(HttpMethod.GET, "/api/v1/stories/me").authenticated()
                                                .requestMatchers(HttpMethod.GET,
-                                                                "/api/v1/users/**",
-                                                                "/api/v1/stories/*",
-                                                                "/api/v1/feed/following").permitAll()
-                                               .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                                                "/users/**",
+                                                                "/stories/*").permitAll()
+                                               .requestMatchers(HttpMethod.GET,
+                                                                "/stories/me",
+                                                                "/feed/**").authenticated()
+                                               .requestMatchers("/recommendations/**").authenticated()
+                                               .requestMatchers("/admin/**").hasRole("ADMIN")
                                                .anyRequest().authenticated()
                                       )
                 .oauth2ResourceServer(oauth2 ->

@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,11 +27,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "Stories Engine",
+@Tag(name = "Stories Manger",
      description = "Endpoints for authoring, updating, publishing, and retrieving stories.")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/api/v1/stories")
+@RequestMapping("/stories")
 @RequiredArgsConstructor
 public class StoryController {
     private final StoryService storyService;
@@ -167,6 +168,7 @@ public class StoryController {
                     description = "Optional filter to isolate specific story statuses like DRAFT or PUBLISHED")
             @RequestParam(required = false) StoryStatus status,
             @Parameter(hidden = true)
+            @ParameterObject
             @PageableDefault(size = 20, sort = "updatedAt", direction = Sort.Direction.DESC)
             Pageable pageable
                                                             ) {
@@ -188,7 +190,7 @@ public class StoryController {
     @GetMapping
     public ResponseEntity<Page<StoryResponse>>
     getPublishedStories (
-            @PageableDefault(
+            @ParameterObject @PageableDefault(
                     size = 20,
                     sort = "publishedAt",
                     direction = Sort.Direction.DESC
