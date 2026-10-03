@@ -2,6 +2,7 @@ package com.tech.wixblog.content.controller;
 
 import com.tech.wixblog.auth.service.AuthenticationService;
 import com.tech.wixblog.content.domain.StoryStatus;
+import com.tech.wixblog.content.dto.CreateStoryRequest;
 import com.tech.wixblog.content.dto.StoryResponse;
 import com.tech.wixblog.content.dto.UpdateStoryRequest;
 import com.tech.wixblog.content.service.StoryService;
@@ -52,7 +53,7 @@ public class StoryController {
     @PostMapping
     public ResponseEntity<StoryResponse> createStory (
             Authentication authentication,
-            @Valid @RequestBody com.wixblog.content.dto.CreateStoryRequest request
+            @Valid @RequestBody CreateStoryRequest request
                                                      ) {
         var authorId = AuthenticatedUser.getId(authentication);
         StoryResponse response = storyService.createDraft(authorId, request);

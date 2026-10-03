@@ -65,7 +65,15 @@ public class AuthenticationService {
                         savedUser,
                         savedUser.getUsername()
                 );
-        userProfileRepository.save(profile);
+        UserProfile savedProfile =
+                userProfileRepository.save(profile);
+        /*
+         * UserProfile is the owning side of the association (@MapsId), so JPA never sets
+         * the inverse side for us. Without this the in-memory user reports a null profile
+         * even though the row exists, which silently breaks anything that reads
+         * user.getProfile() before the session closes - such as UserMapper.
+         */
+        savedUser.attachProfile(savedProfile);
         return RegisterResponse.from(savedUser);
     }
 

@@ -31,7 +31,7 @@ public class UserProfile {
     private String bio;
     @Column(
             name = "avatar_url",
-            length = 500
+            length = 1000
     )
     private String avatarUrl;
     @Column(
