@@ -1,5 +1,6 @@
 package com.tech.wixblog.content.domain;
 
+import com.tech.wixblog.common.exception.BusinessRuleException;
 import com.tech.wixblog.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,12 +54,24 @@ public class Story {
             length = 300
     )
     private String subtitle;
-    @Lob
-    @Column(name = "content", length = 65535)
+    /**
+     * Editor.js block document, serialised as opaque JSON text.
+     * <p>
+     * Declared as {@code text} rather than {@code @Lob}: Hibernate maps
+     * {@code @Lob String} to a Postgres large object ({@code oid}), which cannot be
+     * indexed, compared with {@code LIKE} efficiently, or returned by plain selects
+     * without extra handling. {@code text} is unlimited length, so the previous
+     * {@code length = 65535} ceiling no longer applies here; request-level bounds
+     * live on the DTOs via {@code @Size}.
+     */
+    @Column(
+            name = "content",
+            columnDefinition = "text"
+    )
     private String content;
     @Column(
             name = "cover_image_url",
-            length = 500
+            length = 1000
     )
     private String coverImageUrl;
     @Enumerated(EnumType.STRING)
@@ -140,9 +153,19 @@ public class Story {
         this.coverImageUrl = coverImageUrl;
     }
 
+    /**
+     * Transitions a draft to published.
+     *
+     * @throws com.tech.wixblog.common.exception.BusinessRuleException when the story is
+     *         archived. This uses the same exception as
+     *         {@code StoryService.updateStory}'s equivalent guard, so both spellings of
+     *         the "archived stories are immutable" rule report an identical 422. It
+     *         previously threw {@code IllegalStateException}, which nothing mapped and
+     *         therefore surfaced as a 500 for what is only a bad state transition.
+     */
     public void publish () {
         if (status == StoryStatus.ARCHIVED) {
-            throw new IllegalStateException(
+            throw new BusinessRuleException(
                     "An archived story cannot be published."
             );
         }

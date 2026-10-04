@@ -1,25 +1,47 @@
 package com.tech.wixblog.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Single translation point from exceptions to {@link ApiError} payloads.
+ * Every handler returns the same response shape so clients never have to branch
+ * on response format, only on status code.
+ */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(
-            ResourceAlreadyExistsException.class
-    )
+
+    /* ------------------------------------------------------------------ */
+    /* Conflict / existence                                                */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleConflict (
             ResourceAlreadyExistsException exception,
             HttpServletRequest request
@@ -32,9 +54,174 @@ public class GlobalExceptionHandler {
                          );
     }
 
-    @ExceptionHandler(
-            MethodArgumentNotValidException.class
-    )
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiError> handleDataIntegrityViolation (
+            DataIntegrityViolationException exception,
+            HttpServletRequest request
+                                                       ) {
+        return buildError(
+                HttpStatus.CONFLICT,
+                "The request conflicts with the current state of the resource.",
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Not found                                                           */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound (
+            ResourceNotFoundException exception,
+            HttpServletRequest request
+                                          ) {
+        return buildError(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiError> handleNoHandler (
+            NoHandlerFoundException exception,
+            HttpServletRequest request
+                                          ) {
+        return buildError(
+                HttpStatus.NOT_FOUND,
+                "No endpoint " + exception.getHttpMethod() + " " + exception.getRequestURL(),
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Business rule violations                                            */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ApiError> handleBusinessRule (
+            BusinessRuleException exception,
+            HttpServletRequest request
+                                         ) {
+        return buildError(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Uploads and media                                                   */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidRequest (
+            InvalidRequestException exception,
+            HttpServletRequest request
+                                             ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(UnsupportedMediaException.class)
+    public ResponseEntity<ApiError> handleUnsupportedMedia (
+            UnsupportedMediaException exception,
+            HttpServletRequest request
+                                            ) {
+        return buildError(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiError> handleMediaTypeNotSupported (
+            HttpMediaTypeNotSupportedException exception,
+            HttpServletRequest request
+                                               ) {
+        return buildError(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Content type " + exception.getContentType() + " is not supported by this endpoint.",
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(PayloadTooLargeException.class)
+    public ResponseEntity<ApiError> handlePayloadTooLarge (
+            PayloadTooLargeException exception,
+            HttpServletRequest request
+                                           ) {
+        return buildError(
+                HttpStatus.PAYLOAD_TOO_LARGE,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiError> handleMaxUploadSizeExceeded (
+            MaxUploadSizeExceededException exception,
+            HttpServletRequest request
+                                               ) {
+        return buildError(
+                HttpStatus.PAYLOAD_TOO_LARGE,
+                "The uploaded file exceeds the maximum request size allowed by the server.",
+                request,
+                List.of()
+                         );
+    }
+
+    /**
+     * Multipart resolution failures surface as {@link MultipartException} subclasses
+     * (malformed bodies, truncated parts, I/O errors while spooling to disk).
+     * {@link MaxUploadSizeExceededException} is handled above and takes precedence.
+     */
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiError> handleMultipart (
+            MultipartException exception,
+            HttpServletRequest request
+                                         ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "The multipart request could not be parsed.",
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiError> handleMissingPart (
+            MissingServletRequestPartException exception,
+            HttpServletRequest request
+                                           ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Required file part '" + exception.getRequestPartName() + "' is missing.",
+                request,
+                List.of(new ApiError.FieldError(
+                        exception.getRequestPartName(),
+                        "This file part is required."
+                ))
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Request validation                                                  */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation (
             MethodArgumentNotValidException exception,
             HttpServletRequest request
@@ -58,19 +245,246 @@ public class GlobalExceptionHandler {
                          );
     }
 
-    @ExceptionHandler(
-            BadCredentialsException.class
-    )
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiError> handleConstraintViolation (
+            ConstraintViolationException exception,
+            HttpServletRequest request
+                                               ) {
+        List<ApiError.FieldError> fields =
+                exception.getConstraintViolations()
+                        .stream()
+                        .map(violation ->
+                                     new ApiError.FieldError(
+                                             lastNode(violation.getPropertyPath()
+                                                                         .toString()),
+                                             violation.getMessage()
+                                     )
+                            )
+                        .toList();
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "One or more parameters are invalid.",
+                request,
+                fields
+                         );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError> handleMissingParameter (
+            MissingServletRequestParameterException exception,
+            HttpServletRequest request
+                                                   ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Required parameter '" + exception.getParameterName() + "' is missing.",
+                request,
+                List.of(new ApiError.FieldError(
+                        exception.getParameterName(),
+                        "This parameter is required."
+                ))
+                         );
+    }
+
+    /**
+     * Raised when a {@code @RequestParam}/{@code @PathVariable} cannot be converted,
+     * for example {@code ?scope=NOT_A_SCOPE} bound to a {@code MediaScope} enum.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch (
+            MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request
+                                            ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Parameter '" + exception.getName() + "' has an invalid value.",
+                request,
+                List.of(new ApiError.FieldError(
+                        exception.getName(),
+                        "Value '" + exception.getValue() + "' is not valid for this parameter."
+                ))
+                         );
+    }
+
+    @ExceptionHandler({
+            TypeMismatchException.class,
+            HttpMessageNotReadableException.class
+    })
+    public ResponseEntity<ApiError> handleUnreadable (
+            Exception exception,
+            HttpServletRequest request
+                                         ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "The request body or parameters could not be read.",
+                request,
+                List.of()
+                         );
+    }
+
+    /**
+     * Safety net for argument validation performed inside services and domain helpers
+     * rather than by bean validation on a DTO: an unsupported sort key, a search query
+     * that is too short, a page limit out of range, an unsupported feed type.
+     * <p>
+     * Each of those is a malformed client request, so it belongs at 400 rather than
+     * surfacing as a 500. The named throw sites now raise
+     * {@link InvalidRequestException} for clarity; this mapping covers them and any
+     * future one added without thinking about status codes.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgument (
+            IllegalArgumentException exception,
+            HttpServletRequest request
+                                             ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ApiError> handleInvalidSortProperty (
+            PropertyReferenceException exception,
+            HttpServletRequest request
+                                                ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Invalid sorting property provided.",
+                request,
+                List.of()
+                         );
+    }
+
+    /**
+     * Reported as {@code 405}, not {@code 400}: the request was well formed and the
+     * resource exists, but not for that HTTP method. This was previously folded into
+     * the sort-property handler, which downgraded it to 400 and told the client its
+     * request was malformed when the real problem was the verb.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleMethodNotSupported (
+            HttpRequestMethodNotSupportedException exception,
+            HttpServletRequest request
+                                                ) {
+        return buildError(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "HTTP method " + exception.getMethod()
+                        + " is not supported for this endpoint.",
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Security                                                            */
+    /* ------------------------------------------------------------------ */
+
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiError> handleBadCredentials (
             BadCredentialsException exception,
             HttpServletRequest request
-                                                         ) {
+                                                     ) {
         return buildError(
                 HttpStatus.UNAUTHORIZED,
                 "Invalid email or password.",
                 request,
                 List.of()
                          );
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuthentication (
+            AuthenticationException exception,
+            HttpServletRequest request
+                                         ) {
+        return buildError(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication is required to access this resource.",
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied (
+            AuthorizationDeniedException exception,
+            HttpServletRequest request
+                                         ) {
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "Access denied.",
+                request,
+                List.of()
+                         );
+    }
+
+    /**
+     * Spring Security's {@code AccessDeniedException}, which is a different type from
+     * the {@link AuthorizationDeniedException} above and is what authorization checks
+     * inside services and controllers actually throw.
+     * <p>
+     * Without this mapping the exception escaped to
+     * {@code ExceptionTranslationFilter}, which still produced a 403 but with Spring's
+     * default error body rather than {@link ApiError}, so callers saw two different
+     * error shapes for the same kind of failure.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException (
+            AccessDeniedException exception,
+            HttpServletRequest request
+                                          ) {
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "Access denied.",
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Catch-all                                                           */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Guarantees that every response leaving this application is an {@link ApiError},
+     * including failures nobody anticipated.
+     * <p>
+     * Without a catch-all, an unmapped exception produced Spring's default error body,
+     * so the same class of 500 could be reported in several different shapes depending
+     * on where it originated, and the client had to branch on response format as well as
+     * status code.
+     * <p>
+     * The stack trace is logged server-side but never returned: an error body is not an
+     * appropriate place to expose internals such as SQL fragments or file paths. The
+     * generic message also avoids leaking whether a particular account exists.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected (
+            Exception exception,
+            HttpServletRequest request
+                                   ) {
+        log.error("Unhandled exception for {} {}", request.getMethod(), request.getRequestURI(), exception);
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred while processing the request.",
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Helpers                                                             */
+    /* ------------------------------------------------------------------ */
+
+    private String lastNode (
+            String path
+                        ) {
+        int index = path.lastIndexOf('.');
+        return index < 0
+                ? path
+                : path.substring(index + 1);
     }
 
     private ResponseEntity<ApiError> buildError (
@@ -91,15 +505,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(error);
-    }
-
-    @ExceptionHandler(PropertyReferenceException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidSortProperty (Exception ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", "Invalid sorting property provided.");
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

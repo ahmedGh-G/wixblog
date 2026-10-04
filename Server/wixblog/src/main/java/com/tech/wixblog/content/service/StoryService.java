@@ -6,13 +6,17 @@ import com.tech.wixblog.content.domain.Category;
 import com.tech.wixblog.content.domain.Story;
 import com.tech.wixblog.content.domain.StoryStatus;
 import com.tech.wixblog.content.domain.Tag;
+import com.tech.wixblog.content.dto.CreateStoryRequest;
 import com.tech.wixblog.content.dto.StoryResponse;
 import com.tech.wixblog.content.dto.UpdateStoryRequest;
 import com.tech.wixblog.content.mapper.StoryMapper;
 import com.tech.wixblog.content.repository.CategoryRepository;
 import com.tech.wixblog.content.repository.StoryRepository;
 import com.tech.wixblog.content.repository.TagRepository;
+import com.tech.wixblog.content.validation.InlineImageContentValidator;
 import com.tech.wixblog.content.validation.StoryPublicationValidator;
+import com.tech.wixblog.media.domain.MediaScope;
+import com.tech.wixblog.media.service.MediaService;
 import com.tech.wixblog.user.domain.User;
 import com.tech.wixblog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -33,13 +34,15 @@ public class StoryService {
     private final StoryRepository storyRepository;
     private final UserRepository userRepository;
     private final StoryPublicationValidator storyPublicationValidator;
+    private final InlineImageContentValidator inlineImageContentValidator;
+    private final MediaService mediaService;
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final StoryMapper storyMapper;
 
     public StoryResponse createDraft (
             UUID authorId,
-            com.wixblog.content.dto.CreateStoryRequest request
+            CreateStoryRequest request
                                      ) {
         User author =
                 userRepository.findById(authorId)
@@ -48,13 +51,18 @@ public class StoryService {
                                                      "User not found."
                                              )
                                     );
+        String coverImageUrl =
+                resolveCoverImage(request.coverImageUrl(), authorId);
+        // Every inline image in the document must already be uploaded and owned by this
+        // author, checked before anything is persisted.
+        inlineImageContentValidator.validate(request.content(), author);
         Story story =
                 new Story(author);
         story.updateContent(
                 normalize(request.title()),
                 normalize(request.subtitle()),
                 request.content(),
-                normalize(request.coverImageUrl())
+                coverImageUrl
                            );
         Category category =
                 resolveCategory(
@@ -88,28 +96,27 @@ public class StoryService {
             UUID storyId,
             UpdateStoryRequest request
                                      ) {
-        Story story =
-                storyRepository
-                        .findByIdAndAuthorId(
-                                storyId,
-                                authorId
-                                            )
-                        .orElseThrow(() ->
-                                             new ResourceNotFoundException(
-                                                     "Story not found."
-                                             )
-                                    );
+        Story story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Story not found."));
+        if (!story.getAuthor().getId().equals(authorId)) {
+            throw new BusinessRuleException("Only the author can modify this story.");
+        }
         if (story.getStatus() ==
                 StoryStatus.ARCHIVED) {
             throw new BusinessRuleException(
                     "Archived stories cannot be edited."
             );
         }
+        String previousCover =
+                story.getCoverImageUrl();
+        String coverImageUrl =
+                resolveCoverImage(request.coverImageUrl(), authorId);
+        inlineImageContentValidator.validate(request.content(), story.getAuthor());
         story.updateContent(
                 normalize(request.title()),
                 normalize(request.subtitle()),
                 request.content(),
-                normalize(request.coverImageUrl())
+                coverImageUrl
                            );
         story.assignCategory(
                 resolveCategory(
@@ -121,7 +128,26 @@ public class StoryService {
                         request.tagIds()
                            )
                          );
+        // Only retire the old file once the replacement is accepted, and only when the
+        // cover actually changed, so a no-op edit does not churn storage.
+        if (!Objects.equals(previousCover, story.getCoverImageUrl())) {
+            mediaService.retireReplacedReference(previousCover, authorId);
+        }
         return storyMapper.toResponse(story);
+    }
+
+    /**
+     * Validates a cover reference and confirms the caller owns it.
+     * <p>
+     * The bean-validation constraint on the DTO has already checked that the URL
+     * resolves to a live asset of the right scope. This adds the ownership check, which
+     * the constraint cannot perform because it has no access to the authenticated
+     * principal.
+     */
+    private String resolveCoverImage (String requested, UUID authorId) {
+        String normalised = normalize(requested);
+        mediaService.resolveOwnedReference(normalised, MediaScope.STORY_COVER, authorId);
+        return normalised;
     }
 
     @Transactional
@@ -143,6 +169,13 @@ public class StoryService {
         storyPublicationValidator.validate(
                 story
                                           );
+        // Re-checked at publish time, not only at write time: an image referenced in a
+        // draft may have been deleted between the last edit and publication, and a
+        // published story must never ship a broken image.
+        inlineImageContentValidator.validate(
+                story.getContent(),
+                story.getAuthor()
+                                            );
         story.publish();
         return storyMapper.toResponse(story);
     }

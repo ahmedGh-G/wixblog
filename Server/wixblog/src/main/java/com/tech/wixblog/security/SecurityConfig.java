@@ -29,6 +29,7 @@ public class SecurityConfig {
                                                    ) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> {}) // consumes the CorsConfigurationSource bean
                 .sessionManagement(session ->
                                            session.sessionCreationPolicy(
                                                    SessionCreationPolicy.STATELESS
@@ -48,6 +49,15 @@ public class SecurityConfig {
                                                        "/categories/**"
                                                                )
                                                .permitAll()
+                                               /*
+                                                * Stored images are immutable, publicly cacheable
+                                                * bytes behind an unguessable UUID key. Requiring
+                                                * a bearer token would force the browser to
+                                                * re-authenticate per image and defeat
+                                                * conditional requests.
+                                                */
+                                               .requestMatchers(HttpMethod.GET,
+                                                                "/media/**").permitAll()
                                                .requestMatchers(HttpMethod.GET,
                                                                 "/users/**",
                                                                 "/stories/*").permitAll()

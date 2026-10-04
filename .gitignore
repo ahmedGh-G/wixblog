@@ -18,3 +18,10 @@ Server/wixblog/target/
 Server/wixblog/*.jar
 Server/wixblog/*.war
 Server/wixblog/.mvn/wrapper/
+
+# Uploaded images (local media storage root, see app.media.local-root).
+# The leading slash is essential: an unanchored "media/" pattern would also match
+# Server/wixblog/src/main/java/com/tech/wixblog/media/ and silently exclude the
+# media module's source code.
+/Server/wixblog/media/
+/media/
