@@ -1,5 +1,6 @@
 package com.tech.wixblog.content.domain;
 
+import com.tech.wixblog.common.exception.BusinessRuleException;
 import com.tech.wixblog.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -152,9 +153,19 @@ public class Story {
         this.coverImageUrl = coverImageUrl;
     }
 
+    /**
+     * Transitions a draft to published.
+     *
+     * @throws com.tech.wixblog.common.exception.BusinessRuleException when the story is
+     *         archived. This uses the same exception as
+     *         {@code StoryService.updateStory}'s equivalent guard, so both spellings of
+     *         the "archived stories are immutable" rule report an identical 422. It
+     *         previously threw {@code IllegalStateException}, which nothing mapped and
+     *         therefore surfaced as a 500 for what is only a bad state transition.
+     */
     public void publish () {
         if (status == StoryStatus.ARCHIVED) {
-            throw new IllegalStateException(
+            throw new BusinessRuleException(
                     "An archived story cannot be published."
             );
         }

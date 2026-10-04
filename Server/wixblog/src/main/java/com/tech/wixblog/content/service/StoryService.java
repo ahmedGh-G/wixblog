@@ -25,11 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -60,7 +56,6 @@ public class StoryService {
         // Every inline image in the document must already be uploaded and owned by this
         // author, checked before anything is persisted.
         inlineImageContentValidator.validate(request.content(), author);
-
         Story story =
                 new Story(author);
         story.updateContent(
@@ -101,17 +96,11 @@ public class StoryService {
             UUID storyId,
             UpdateStoryRequest request
                                      ) {
-        Story story =
-                storyRepository
-                        .findByIdAndAuthorId(
-                                storyId,
-                                authorId
-                                            )
-                        .orElseThrow(() ->
-                                             new ResourceNotFoundException(
-                                                     "Story not found."
-                                             )
-                                    );
+        Story story = storyRepository.findById(storyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Story not found."));
+        if (!story.getAuthor().getId().equals(authorId)) {
+            throw new BusinessRuleException("Only the author can modify this story.");
+        }
         if (story.getStatus() ==
                 StoryStatus.ARCHIVED) {
             throw new BusinessRuleException(
@@ -122,9 +111,7 @@ public class StoryService {
                 story.getCoverImageUrl();
         String coverImageUrl =
                 resolveCoverImage(request.coverImageUrl(), authorId);
-
         inlineImageContentValidator.validate(request.content(), story.getAuthor());
-
         story.updateContent(
                 normalize(request.title()),
                 normalize(request.subtitle()),
@@ -141,13 +128,11 @@ public class StoryService {
                         request.tagIds()
                            )
                          );
-
         // Only retire the old file once the replacement is accepted, and only when the
         // cover actually changed, so a no-op edit does not churn storage.
         if (!Objects.equals(previousCover, story.getCoverImageUrl())) {
             mediaService.retireReplacedReference(previousCover, authorId);
         }
-
         return storyMapper.toResponse(story);
     }
 
@@ -190,7 +175,7 @@ public class StoryService {
         inlineImageContentValidator.validate(
                 story.getContent(),
                 story.getAuthor()
-                                             );
+                                            );
         story.publish();
         return storyMapper.toResponse(story);
     }

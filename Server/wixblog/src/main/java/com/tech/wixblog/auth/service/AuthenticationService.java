@@ -111,6 +111,14 @@ public class AuthenticationService {
         );
     }
 
+    /**
+     * Extracts the caller's identifier from the authenticated principal.
+     * <p>
+     * A principal whose name is not a UUID cannot be mapped to a user, so this is
+     * reported as an authentication failure (401) rather than as an internal error. It
+     * previously threw {@code IllegalStateException}, which no handler mapped and
+     * therefore surfaced as a 500 on what is in practice a bad-credential condition.
+     */
     public UUID getAuthenticatedUserId (Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new InsufficientAuthenticationException(
@@ -120,9 +128,8 @@ public class AuthenticationService {
         try {
             return UUID.fromString(authentication.getName());
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new IllegalStateException(
-                    "The authentication principal name is not a valid UUID string: "
-                            + authentication.getName()
+            throw new InsufficientAuthenticationException(
+                    "The authentication principal name is not a valid UUID string."
             );
         }
     }

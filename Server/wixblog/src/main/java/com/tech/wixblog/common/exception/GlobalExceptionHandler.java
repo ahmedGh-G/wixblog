@@ -2,12 +2,14 @@ package com.tech.wixblog.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -24,16 +26,14 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Single translation point from exceptions to {@link ApiError} payloads.
  * Every handler returns the same response shape so clients never have to branch
  * on response format, only on status code.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -321,21 +321,57 @@ public class GlobalExceptionHandler {
                          );
     }
 
-    @ExceptionHandler({
-            PropertyReferenceException.class,
-            HttpRequestMethodNotSupportedException.class
-    })
-    public ResponseEntity<ApiError> handleBadRequestShape (
-            Exception exception,
+    /**
+     * Safety net for argument validation performed inside services and domain helpers
+     * rather than by bean validation on a DTO: an unsupported sort key, a search query
+     * that is too short, a page limit out of range, an unsupported feed type.
+     * <p>
+     * Each of those is a malformed client request, so it belongs at 400 rather than
+     * surfacing as a 500. The named throw sites now raise
+     * {@link InvalidRequestException} for clarity; this mapping covers them and any
+     * future one added without thinking about status codes.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiError> handleIllegalArgument (
+            IllegalArgumentException exception,
             HttpServletRequest request
-                                         ) {
-        String message =
-                exception instanceof PropertyReferenceException
-                        ? "Invalid sorting property provided."
-                        : "HTTP method is not supported for this endpoint.";
+                                             ) {
         return buildError(
                 HttpStatus.BAD_REQUEST,
-                message,
+                exception.getMessage(),
+                request,
+                List.of()
+                         );
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ApiError> handleInvalidSortProperty (
+            PropertyReferenceException exception,
+            HttpServletRequest request
+                                                ) {
+        return buildError(
+                HttpStatus.BAD_REQUEST,
+                "Invalid sorting property provided.",
+                request,
+                List.of()
+                         );
+    }
+
+    /**
+     * Reported as {@code 405}, not {@code 400}: the request was well formed and the
+     * resource exists, but not for that HTTP method. This was previously folded into
+     * the sort-property handler, which downgraded it to 400 and told the client its
+     * request was malformed when the real problem was the verb.
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleMethodNotSupported (
+            HttpRequestMethodNotSupportedException exception,
+            HttpServletRequest request
+                                                ) {
+        return buildError(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "HTTP method " + exception.getMethod()
+                        + " is not supported for this endpoint.",
                 request,
                 List.of()
                          );
@@ -384,6 +420,60 @@ public class GlobalExceptionHandler {
                          );
     }
 
+    /**
+     * Spring Security's {@code AccessDeniedException}, which is a different type from
+     * the {@link AuthorizationDeniedException} above and is what authorization checks
+     * inside services and controllers actually throw.
+     * <p>
+     * Without this mapping the exception escaped to
+     * {@code ExceptionTranslationFilter}, which still produced a 403 but with Spring's
+     * default error body rather than {@link ApiError}, so callers saw two different
+     * error shapes for the same kind of failure.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDeniedException (
+            AccessDeniedException exception,
+            HttpServletRequest request
+                                          ) {
+        return buildError(
+                HttpStatus.FORBIDDEN,
+                "Access denied.",
+                request,
+                List.of()
+                         );
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Catch-all                                                           */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Guarantees that every response leaving this application is an {@link ApiError},
+     * including failures nobody anticipated.
+     * <p>
+     * Without a catch-all, an unmapped exception produced Spring's default error body,
+     * so the same class of 500 could be reported in several different shapes depending
+     * on where it originated, and the client had to branch on response format as well as
+     * status code.
+     * <p>
+     * The stack trace is logged server-side but never returned: an error body is not an
+     * appropriate place to expose internals such as SQL fragments or file paths. The
+     * generic message also avoids leaking whether a particular account exists.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected (
+            Exception exception,
+            HttpServletRequest request
+                                   ) {
+        log.error("Unhandled exception for {} {}", request.getMethod(), request.getRequestURI(), exception);
+        return buildError(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred while processing the request.",
+                request,
+                List.of()
+                         );
+    }
+
     /* ------------------------------------------------------------------ */
     /* Helpers                                                             */
     /* ------------------------------------------------------------------ */
@@ -415,15 +505,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(error);
-    }
-
-    @ExceptionHandler(PropertyReferenceException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidSortProperty (Exception ex) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("error", "Bad Request");
-        body.put("message", "Invalid sorting property provided.");
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }

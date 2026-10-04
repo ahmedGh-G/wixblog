@@ -1,5 +1,6 @@
 package com.tech.wixblog.feed.service;
 
+import com.tech.wixblog.common.exception.InvalidRequestException;
 import com.tech.wixblog.feed.dto.AuthorRecommendationProjection;
 import com.tech.wixblog.feed.dto.AuthorRecommendationResponse;
 import com.tech.wixblog.feed.dto.CategoryRecommendationProjection;
@@ -71,7 +72,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     private void validateLimit (int limit) {
         if (limit < 1 || limit > 50) {
-            throw new IllegalArgumentException(
+            throw new InvalidRequestException(
                     "Limit must be between 1 and 50"
             );
         }

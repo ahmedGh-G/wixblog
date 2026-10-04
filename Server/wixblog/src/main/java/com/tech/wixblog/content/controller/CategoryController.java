@@ -6,7 +6,7 @@ import com.tech.wixblog.content.dto.StorySearchResponse;
 import com.tech.wixblog.content.service.CategoryService;
 import com.tech.wixblog.content.service.StorySearchService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,60 +22,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "Category Manger",
-     description = "Endpoints for managing Stories categories")
-@RestController
+@Tag(
+        name = "Categories",
+        description = "Endpoints for browsing story categories and the stories filed under them."
+                )
 @SecurityRequirement(name = "bearerAuth")
+@RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 public class CategoryController {
+
     private final CategoryService categoryService;
     private final StorySearchService storySearchService;
 
     @Operation(
-            summary = "Get available story categories",
-            description =
-                    "Returns all categories available for story classification."
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Categories retrieved successfully"
+            summary = "List all categories",
+            description = "Returns every category available for classifying a story. Public."
     )
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>>
-    getCategories () {
-        return ResponseEntity.ok(
-                categoryService.getAll()
-                                );
+    public ResponseEntity<List<CategoryResponse>> getCategories () {
+        return ResponseEntity.ok(categoryService.getAll());
     }
 
     @Operation(
-            summary = "Search category by slug",
-            description =
-                    "Returns a category search result by slug"
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "Category retrieved successfully"
+            summary = "Get a category by slug",
+            description = "Returns a single category. Public."
     )
     @GetMapping("/{slug}")
-    public ResponseEntity<CategoryResponse>
-    getBySlug (
+    public ResponseEntity<CategoryResponse> getBySlug (
+            @Parameter(description = "URL-safe category identifier, for example 'technology'")
             @PathVariable String slug
-              ) {
-        return ResponseEntity.ok(
-                categoryService.getBySlug(slug)
-                                );
+                                                   ) {
+        return ResponseEntity.ok(categoryService.getBySlug(slug));
     }
 
+    @Operation(
+            summary = "List stories in a category",
+            description = "Paginated published stories filed under the given category. Public."
+    )
     @GetMapping("/{slug}/stories")
-    public ResponseEntity<Page<StorySearchResponse>>
-    getCategoryStories (
+    public ResponseEntity<Page<StorySearchResponse>> getCategoryStories (
+            @Parameter(description = "URL-safe category identifier")
             @PathVariable String slug,
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable
-                       ) {
-        CategoryResponse category =
-                categoryService.getBySlug(slug);
+            @ParameterObject
+            @PageableDefault(size = 20)
+            Pageable pageable
+                                                   ) {
+        CategoryResponse category = categoryService.getBySlug(slug);
         StorySearchRequest request =
                 new StorySearchRequest(
                         null,
@@ -84,10 +77,7 @@ public class CategoryController {
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
                         "latest"
-                );
-        return ResponseEntity.ok(
-                storySearchService.search(request)
                                 );
+        return ResponseEntity.ok(storySearchService.search(request));
     }
-
 }

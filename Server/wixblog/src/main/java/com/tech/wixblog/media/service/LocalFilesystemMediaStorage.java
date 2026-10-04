@@ -47,6 +47,13 @@ public class LocalFilesystemMediaStorage
      * and {@code /} under a systemd unit. Pinning the absolute path here means uploads
      * and the handler that serves them always agree, and it lets the directory be
      * created and permission-checked at boot instead of on the first upload.
+     * <p>
+     * The {@code IllegalStateException}s below are deliberately left unmapped by the
+     * common exception layer. This runs during context initialisation, before any
+     * {@code HandlerExceptionResolver} exists, so a failure here cannot be reported as
+     * an HTTP response and must abort startup instead. Converting them to a
+     * {@code BusinessRuleException} would only hide a misconfiguration behind a 500
+     * later.
      */
     @PostConstruct
     void initialise () {
