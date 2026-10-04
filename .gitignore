@@ -12,6 +12,7 @@ UI/node_modules/
 UI/dist/
 UI/.angular/
 UI/.tmp/
+UI/protoyping/
 
 # === Spring Boot Server (Server Project) ===
 Server/wixblog/target/
