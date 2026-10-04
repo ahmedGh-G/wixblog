@@ -53,12 +53,24 @@ public class Story {
             length = 300
     )
     private String subtitle;
-    @Lob
-    @Column(name = "content", length = 65535)
+    /**
+     * Editor.js block document, serialised as opaque JSON text.
+     * <p>
+     * Declared as {@code text} rather than {@code @Lob}: Hibernate maps
+     * {@code @Lob String} to a Postgres large object ({@code oid}), which cannot be
+     * indexed, compared with {@code LIKE} efficiently, or returned by plain selects
+     * without extra handling. {@code text} is unlimited length, so the previous
+     * {@code length = 65535} ceiling no longer applies here; request-level bounds
+     * live on the DTOs via {@code @Size}.
+     */
+    @Column(
+            name = "content",
+            columnDefinition = "text"
+    )
     private String content;
     @Column(
             name = "cover_image_url",
-            length = 500
+            length = 1000
     )
     private String coverImageUrl;
     @Enumerated(EnumType.STRING)

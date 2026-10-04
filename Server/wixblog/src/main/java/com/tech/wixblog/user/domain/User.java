@@ -2,7 +2,7 @@ package com.tech.wixblog.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
@@ -22,9 +22,16 @@ import java.util.UUID;
                 )
         }
 )
+/**
+ * Deliberately {@code @Getter} rather than {@code @Data}: the generated
+ * {@code equals}/{@code hashCode}/{@code toString} from {@code @Data} traverse
+ * LAZY associations, which fail with {@code LazyInitializationException} under
+ * {@code spring.jpa.open-in-view=false}. Equality is bound to the immutable
+ * natural key {@link #id} only, for the same reason.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -82,6 +89,18 @@ public class User {
         this.status = status;
     }
 
+    /**
+     * Maintains the inverse side of the {@code profile} association.
+     * <p>
+     * {@code UserProfile} is the owning side (it holds {@code @MapsId} and the shared
+     * primary key), so JPA will not populate {@code User.profile} automatically. Without
+     * this, a freshly registered user reports a null profile in memory even though the
+     * row was written, which breaks any code that reads it within the same transaction.
+     */
+    public void attachProfile (UserProfile profile) {
+        this.profile = profile;
+    }
+
     @PrePersist
     protected void onCreate () {
         this.createdAt = Instant.now();
@@ -91,5 +110,26 @@ public class User {
     @PreUpdate
     protected void onUpdate () {
         this.updatedAt = Instant.now();
+    }
+
+    @Override
+    public boolean equals (Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return id != null && id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode () {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString () {
+        return "User{id=%s, username=%s}".formatted(id, username);
     }
 }

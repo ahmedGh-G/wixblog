@@ -28,9 +28,15 @@ spring:
           issuer: wixblog-api
           access-token-expiration-seconds: 1800
 
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+  servlet:
+    multipart:
+      enabled: true
+      # Global ceiling only. Per-scope limits (avatar / cover / inline) are enforced in
+      # ImageValidator via app.media, so this can sit generously above them.
+      max-file-size: 20MB
+      max-request-size: 20MB
+      # Spool straight to disk rather than buffering uploads in heap.
+      file-size-threshold: 0
 
   springdoc:
     api-docs:
@@ -43,10 +49,82 @@ spring:
       persist-authorization: true
 
 
-
 server:
   port: 8080
   servlet:
     context-path: /api/v1
 
 
+app:
+
+  cors:
+    allowed-origins:
+      - "http://localhost:4200"
+      - "http://127.0.0.1:4200"
+    max-age: 3600s
+
+  media:
+    # LOCAL is the only shipped implementation. The MediaStorage interface is the seam
+    # for an S3 or GCS backend.
+    storage: local
+
+    # Resolved to an absolute path at startup. Must be writable by the service account.
+    local-root: ./media
+
+    # Served under the servlet context path, so uploads are reachable at
+    # /api/v1/media/<scope>/<yyyy>/<MM>/<uuid>.<ext>
+    public-path: /media
+
+    # Leave blank in development to derive scheme/host/context-path from the request.
+    # Set an explicit origin in production so URLs stay correct behind a proxy.
+    public-base-url: ""
+
+    # When false, covers and avatars must reference an image issued by
+    # POST /media/images. Prevents hotlinking and third-party reader tracking.
+    allow-external-urls: false
+
+    # Re-encode accepted images to strip EXIF (including GPS coordinates from phone
+    # cameras) and collapse polyglot files. Animated GIFs are stored untouched.
+    sanitize-enabled: true
+
+    # Keys are UUIDs and content at a key never changes, so this can be very long.
+    cache-ttl: 30d
+
+    # Optional per-scope overrides. Omitted keys fall back to the defaults declared on
+    # the MediaScope enum.
+    scopes:
+      AVATAR:
+        max-size: 2MB
+        content-types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      STORY_COVER:
+        max-size: 5MB
+        content-types:
+          - image/jpeg
+          - image/png
+          - image/webp
+      INLINE_IMAGE:
+        max-size: 8MB
+        content-types:
+          - image/jpeg
+          - image/png
+          - image/webp
+          - image/gif
+
+    cleanup:
+      # Retries physical deletion of retired assets whose file removal failed.
+      # Deliberately does NOT sweep never-referenced uploads: inline images are
+      # referenced only from inside Story.content, and a sweep that guessed wrong
+      # would delete images out of published articles.
+      enabled: false
+      cron: "0 17 * * * *"
+      grace-period: 24h
+      orphan-grace-period: 24h
+      batch-size: 100
+
+
+logging:
+  level:
+    com.tech.wixblog.media: INFO
