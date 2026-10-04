@@ -19,33 +19,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-@Tag(name = "Story search Api",
-     description = "Endpoints for Stories search based")
+@Tag(
+        name = "Story search",
+        description = "Full-text and faceted search across published stories."
+                )
 @RestController
 @RequestMapping("/search")
 @RequiredArgsConstructor
 public class StorySearchController {
+
     private final StorySearchService searchService;
 
     @Operation(
             summary = "Search published stories",
-            description =
-                    "Search stories by title, subtitle, content, category or tag."
+            description = """
+                    Matches on title, subtitle and body content, and can be narrowed by category
+                    or tag. All filters are optional and combine.
+
+                    `sort` accepts `latest` (the default) or `oldest`; any other value is
+                    rejected as a bad request.
+                    """
     )
     @GetMapping("/stories")
-    public ResponseEntity<Page<StorySearchResponse>>
-    searchStories (
-            @Parameter(
-                    description = "Search keyword"
-            )
-            @RequestParam(required = false)
-            String q,
-            @RequestParam(required = false)
-            UUID categoryId,
-            @RequestParam(required = false)
-            String tag,
-            @ParameterObject @PageableDefault(size = 20) Pageable pageable,
-            String sort) {
+    public ResponseEntity<Page<StorySearchResponse>> searchStories (
+            @Parameter(description = "Search keyword")
+            @RequestParam(required = false) String q,
+            @Parameter(description = "Restrict results to one category")
+            @RequestParam(required = false) UUID categoryId,
+            @Parameter(description = "Restrict results to one tag slug")
+            @RequestParam(required = false) String tag,
+            @ParameterObject
+            @PageableDefault(size = 20)
+            Pageable pageable,
+            @Parameter(description = "Sort order: latest or oldest")
+            @RequestParam(required = false) String sort
+                                             ) {
         StorySearchRequest request =
                 new StorySearchRequest(
                         q,
@@ -54,11 +62,7 @@ public class StorySearchController {
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
                         sort
-                );
-        return ResponseEntity.ok(
-                searchService.search(request)
                                 );
+        return ResponseEntity.ok(searchService.search(request));
     }
-
-
 }

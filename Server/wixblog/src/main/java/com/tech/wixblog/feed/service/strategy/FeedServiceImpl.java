@@ -1,5 +1,6 @@
 package com.tech.wixblog.feed.service.strategy;
 
+import com.tech.wixblog.common.exception.InvalidRequestException;
 import com.tech.wixblog.content.dto.StorySummaryResponse;
 import com.tech.wixblog.feed.domain.FeedType;
 import com.tech.wixblog.feed.service.I.FeedService;
@@ -39,7 +40,7 @@ public class FeedServiceImpl implements FeedService {
         FeedStrategy strategy =
                 strategies.get(type);
         if (strategy == null) {
-            throw new IllegalArgumentException(
+            throw new InvalidRequestException(
                     "Unsupported feed type: " + type
             );
         }
