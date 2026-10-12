@@ -14,11 +14,10 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideChevronRight, lucideCompass, lucidePlus } from '@ng-icons/lucide';
 import { RouterLink } from '@angular/router';
 
-import { PATHS } from '../../../../../context/paths';
 import { EXPLORE_TOPIC_BAR_ITEMS, type ExploreTopicBarItem } from '../data/explore-topics.data';
 
 /**
- * The horizontal topic pill bar (`protoyping/explore/topics-bar.png`).
+ * The horizontal topic pill bar (`prototyping/explore/topics-bar.png`).
  *
  * Sizing follows the spec measured off the full-page screenshot: a 27.986px-tall row
  * sitting at the top of the same 1496.458px centered column as the rest of the page.
@@ -29,12 +28,14 @@ import { EXPLORE_TOPIC_BAR_ITEMS, type ExploreTopicBarItem } from '../data/explo
  * The two arrows scroll by whole viewports rather than a fixed pixel delta, and every
  * landing position is snapped to a multiple of the viewport width:
  *
- *     target = round(scrollLeft / viewportWidth) * viewportWidth   (± 1 viewport)
+ *     target = round(scrollLeft / viewportWidth) * viewportWidth   (Â± 1 viewport)
  *
  * Snapping is what makes the round trip exact. Without it, scrolling right then left
  * subtracts the same width from an off-boundary offset and lands a few pixels away from
- * where it started — visibly asymmetric once the bar has a partial page at its end.
+ * where it started â€” visibly asymmetric once the bar has a partial page at its end.
  */
+import { PATHS } from '@shared/paths';
+
 @Component({
   selector: 'app-explore-topics-bar',
   imports: [RouterLink, NgIcon],
@@ -131,7 +132,7 @@ export class ExploreTopicsBar {
     });
   }
 
-  /** Topic detail lives at PATHS.topic(slug), i.e. ['/topic', slug]. */
+  /** Topic detail lives at PATHS.topic(slug). */
   protected topicPath = (slug: string) => PATHS.topic(slug);
 
   protected onScroll = () => this.scrollLeft.set(this.scroller().nativeElement.scrollLeft);
@@ -187,9 +188,7 @@ export class ExploreTopicsBar {
     // Pills can wrap/reflow without the scroller box itself resizing.
     observer.observe(this.host.nativeElement);
 
-    this.host.nativeElement
-      .getRootNode()
-      .addEventListener('resize', () => this.measure());
+    this.host.nativeElement.getRootNode().addEventListener('resize', () => this.measure());
 
     // Clean up when the view is torn down.
     queueMicrotask(() => {

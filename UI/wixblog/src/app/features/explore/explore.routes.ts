@@ -5,13 +5,14 @@
  * Slice layout: pages/ components/ data/ services/ directives/ pipes/
  *
  * Mounted at "" under MainLayout, so these paths are the absolute URLs:
- *   /explore-topics   see PATHS.topics
+ *   /explore-topics
  */
 export const EXPLORE_ROUTES: Routes = [
   {
     path: 'explore-topics',
     pathMatch: 'full',
-    loadComponent: () => import('@features/explore/pages/explore-topics.page').then((m) => m.ExploreTopicsPage),
+    loadComponent: () =>
+      import('@features/explore/pages/explore-topics.page').then((m) => m.ExploreTopicsPage),
   },
   {
     path: 'search',

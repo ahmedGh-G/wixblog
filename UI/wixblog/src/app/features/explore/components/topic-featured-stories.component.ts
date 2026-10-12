@@ -1,16 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 
-import {
-  POPULAR_STORIES,
-  SELECTED_STORIES,
-  type TopicStory,
-} from '../data/topic-detail.data';
+import { POPULAR_STORIES, SELECTED_STORIES, type TopicStory } from '../data/topic-detail.data';
 import { TopicStoryRow } from './topic-story-row.component';
 
 /**
- * `protoyping/explore/topic/selected(featured)-topic-stories.png`
+ * `prototyping/explore/topic/selected(featured)-topic-stories.png`
  *
- * Two equal columns — "Selected by Medium" and "Popular this week" — each a heading,
+ * Two equal columns â€” "Selected by Medium" and "Popular this week" â€” each a heading,
  * a hairline, then five rows.
  */
 @Component({

@@ -7,11 +7,17 @@ import {
   input,
   output,
   signal,
-  viewChild
+  viewChild,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideBell, lucideLayoutGrid, lucideMenu, lucidePenLine, lucideSearch } from '@ng-icons/lucide';
+import {
+  lucideBell,
+  lucideLayoutGrid,
+  lucideMenu,
+  lucidePenLine,
+  lucideSearch,
+} from '@ng-icons/lucide';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
@@ -19,10 +25,10 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmTooltipImports } from '@spartan-ng/helm/tooltip';
 import { HlmSidebarService } from '@spartan-ng/helm/sidebar';
 
+import { PATHS } from '@shared/paths';
+
 import { TopbarExplorePopup } from './topbar-explore-popup.component';
 import { UserProfileMenu } from './user-profile-menu.component';
-
-import { PATHS } from '../../../../context/paths';
 
 @Component({
   selector: 'app-topbar',
@@ -106,16 +112,16 @@ import { PATHS } from '../../../../context/paths';
           PlayGames
         </button>
 
-        <button
+        <a
           hlmBtn
           variant="ghost"
           size="sm"
-          type="button"
+          [routerLink]="PATHS.newStory"
           class="gap-1.5 text-muted-foreground"
         >
           <ng-icon name="lucidePenLine" class="size-4" />
           Write
-        </button>
+        </a>
 
         <span hlmTooltip="Notifications">
           <button

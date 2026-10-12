@@ -1,5 +1,7 @@
 import type { CanActivateFn, CanMatchFn } from '@angular/router';
 
+import { PATHS } from '@shared/paths';
+
 /**
  * Placeholder auth state.
  * Replace with a real signal store / AuthService when the identity slice lands.

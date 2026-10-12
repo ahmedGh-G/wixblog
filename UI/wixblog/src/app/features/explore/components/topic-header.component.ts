@@ -4,7 +4,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { TOPIC_HEADER, type TopicHeaderData } from '../data/topic-detail.data';
 
 /**
- * `protoyping/explore/topic/topic-header-section.png`
+ * `prototyping/explore/topic/topic-header-section.png`
  *
  * Title and the Follow / Mute pair on the left, cover image on the right, and a
  * hairline above the three-up stat row.

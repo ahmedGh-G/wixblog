@@ -8,7 +8,7 @@ import {
   lucidePlus,
   lucideSearch,
   lucideUser,
-  lucideUsers
+  lucideUsers,
 } from '@ng-icons/lucide';
 import { RouterLink } from '@angular/router';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
@@ -31,8 +31,6 @@ import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div id="app-nav-sidebar" class="flex h-full flex-col" hlmSidebarContent>
-
-
       <nav hlmSidebarGroup aria-label="Main">
         <ul hlmSidebarMenu>
           @for (item of navItems; track item.label) {
@@ -54,10 +52,7 @@ import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
       <div hlmSidebarSeparator class="my-2 border-t border-border"></div>
 
       <div hlmSidebarGroup class="px-4 pb-6">
-        <h2
-          hlmSidebarGroupLabel
-          class="h-auto px-0 text-[13px] font-normal text-muted-foreground"
-        >
+        <h2 hlmSidebarGroupLabel class="h-auto px-0 text-[13px] font-normal text-muted-foreground">
           Following
         </h2>
 

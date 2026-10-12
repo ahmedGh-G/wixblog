@@ -9,16 +9,16 @@ import { EXPLORE_TAXONOMY } from '../data/explore-taxonomy.data';
 import { filterTaxonomy } from '../data/explore-taxonomy.filter';
 
 /**
- * `/explore-topics` — see PATHS.topics.
+ * `/explore-topics` â€” see EXPLORE_ROUTES in ../explore.routes.ts.
  *
- * Full-page composition of `protoyping/explore/`, top to bottom:
+ * Full-page composition of `prototyping/explore/`, top to bottom:
  *   1. the scrolling topic pill bar                     (topics-bar.png)
  *   2. heading, pill search, recommended row   (exploer-topics-section.png)
- *   3. the category → subcategory → tag grid  (explore-topics-fullpage.png)
+ *   3. the category â†’ subcategory â†’ tag grid  (explore-topics-fullpage.png)
  *   4. the "Suggest an edit" strip
  *   5. the footer link list
  *
- * The whole page lives in one centered 1496.458px column with 24px side gutters —
+ * The whole page lives in one centered 1496.458px column with 24px side gutters â€”
  * the content box measured off `explore-topics-fullpage.png`. `max-w` plus `mx-auto`
  * keeps it fluid: it fills narrower viewports and centers on wider ones.
  *

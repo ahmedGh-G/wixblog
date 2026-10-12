@@ -4,19 +4,20 @@ import { lucideChevronDown } from '@ng-icons/lucide';
 import { RouterLink } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 
-import { PATHS } from '../../../../../context/paths';
 import type { ExploreCategory } from '../data/explore-taxonomy.data';
 import { ExploreSubcategoryComponent } from './explore-subcategory.component';
 
 /**
- * One category column of the taxonomy grid — the "Life" cell in
- * `protoyping/explore/category-subcategory-tags-list-example.png`.
+ * One category column of the taxonomy grid â€” the "Life" cell in
+ * `prototyping/explore/category-subcategory-tags-list-example.png`.
  *
  * The reference already lists every subcategory (Life shows all three), so the green
  * "Show all in <Category>" control expands the tags *within* those subcategories rather
  * than revealing more subcategories. When expanded, each subcategory receives its
  * hidden tags and drops its own "More".
  */
+import { PATHS } from '@shared/paths';
+
 @Component({
   selector: 'app-explore-category-cell',
   imports: [RouterLink, NgIcon, HlmButtonImports, ExploreSubcategoryComponent],
