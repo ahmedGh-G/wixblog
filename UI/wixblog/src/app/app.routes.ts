@@ -1,7 +1,7 @@
-import type {Routes} from '@angular/router';
-import {authGuard, guestGuard, permissionGuard} from '@core/auth/auth.guards';
-import {profileMatcher} from '@core/routing/profile.matcher';
-import {unsavedChangesGuard} from '@core/routing/unsaved-changes.guard';
+import type { Routes } from '@angular/router';
+import { authGuard, guestGuard, permissionGuard } from '@core/auth/auth.guards';
+import { profileMatcher } from '@core/routing/profile.matcher';
+import { unsavedChangesGuard } from '@core/routing/unsaved-changes.guard';
 
 /**
  * Skeleton generated from docs/SITEMAP.md.
@@ -88,6 +88,10 @@ export const routes: Routes = [
     ],
   },
 
+  {
+    path: 'new-story',
+    loadChildren: () => import('@features/editor/editor.routes').then((m) => m.EDITOR_ROUTES),
+  }, //
   // ───────────────────────────── ② EditorLayout: distraction-free writing
   {
     path: '',

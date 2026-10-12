@@ -1,16 +1,16 @@
 /**
- * Category → subcategory → tag taxonomy for /explore-topics.
+ * Category â†’ subcategory â†’ tag taxonomy for /explore-topics.
  *
- * Transcribed verbatim from `protoyping/explore/explore-topics-fullpage.png`.
+ * Transcribed verbatim from `prototyping/explore/explore-topics-fullpage.png`.
  * Column order in that screenshot is row-major across three columns:
- *   Life · Self Improvement · Work
- *   Technology · Software Development · Media
- *   Society · Culture · World
+ *   Life Â· Self Improvement Â· Work
+ *   Technology Â· Software Development Â· Media
+ *   Society Â· Culture Â· World
  * which is preserved in EXPLORE_TAXONOMY below.
  *
  * Every category carries exactly three subcategories. Work's third (Leadership) was
- * missing from the first transcription — it only became visible in
- * `protoyping/explore/taxonomy-grid layring.png`, where the devtools overlay shows the
+ * missing from the first transcription â€” it only became visible in
+ * `prototyping/explore/taxonomy-grid layring.png`, where the devtools overlay shows the
  * full Work column: Business, Marketing, Leadership.
  */
 
@@ -25,7 +25,7 @@ export interface ExploreSubcategory {
   /** The tags visible in the reference screenshot, in order. */
   readonly tags: readonly ExploreTag[];
   /**
-   * SYNTHESIZED — not in the screenshot.
+   * SYNTHESIZED â€” not in the screenshot.
    *
    * The reference truncates each subcategory and hides the tail behind "More", so the
    * hidden portion is not visible anywhere in the image. These are plausible additions
@@ -41,7 +41,7 @@ export interface ExploreCategory {
 }
 
 export const EXPLORE_TAXONOMY: readonly ExploreCategory[] = [
-  // ── Row 1 ──────────────────────────────────────────────────────────────────────
+  // â”€â”€ Row 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     label: 'Life',
     slug: 'life',
@@ -209,7 +209,7 @@ export const EXPLORE_TAXONOMY: readonly ExploreCategory[] = [
     ],
   },
 
-  // ── Row 2 ──────────────────────────────────────────────────────────────────────
+  // â”€â”€ Row 2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     label: 'Technology',
     slug: 'technology',
@@ -381,7 +381,7 @@ export const EXPLORE_TAXONOMY: readonly ExploreCategory[] = [
     ],
   },
 
-  // ── Row 3 ──────────────────────────────────────────────────────────────────────
+  // â”€â”€ Row 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   {
     label: 'Society',
     slug: 'society',

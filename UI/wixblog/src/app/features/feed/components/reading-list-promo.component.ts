@@ -48,8 +48,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
       <div class="p-4">
         <h3 class="text-sm font-bold">Reading list</h3>
         <p class="text-muted-foreground mt-1 text-[13px] leading-relaxed">
-          Click the save icon on any story to add it to your reading list or a custom list that you can
-          share.
+          Click the save icon on any story to add it to your reading list or a custom list that you
+          can share.
         </p>
       </div>
     </div>

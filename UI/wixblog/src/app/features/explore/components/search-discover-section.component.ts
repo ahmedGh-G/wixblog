@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 
-import { PATHS } from '../../../../../context/paths';
 import {
   SEARCH_FOOTER_LINKS,
   SEARCH_PEOPLE,
@@ -14,15 +13,17 @@ import {
 } from '../data/search.data';
 
 /**
- * `protoyping/explore/search/discover-section.png`
+ * `prototyping/explore/search/discover-section.png`
  *
  * Topics / People / Publications matching the query, each block separated by a
  * hairline, then the footer link list.
  *
  * Topic pills link to the topic page like everywhere else in explore. People and
- * publications carry a Follow button that toggles locally — there is no auth service
+ * publications carry a Follow button that toggles locally â€” there is no auth service
  * yet, so nothing persists.
  */
+import { PATHS } from '@shared/paths';
+
 @Component({
   selector: 'app-search-discover-section',
   imports: [RouterLink, NgIcon, HlmButtonImports, HlmAvatarImports],

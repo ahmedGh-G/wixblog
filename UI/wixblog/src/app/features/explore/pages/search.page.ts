@@ -6,9 +6,9 @@ import { map } from 'rxjs';
 import { SearchDiscoverSection, SearchMainSection } from '@features/explore';
 
 /**
- * `/search?q=<query>` — see PATHS.search.
+ * `/search?q=<query>` â€” see EXPLORE_ROUTES in ../explore.routes.ts.
  *
- * Two columns from `protoyping/explore/search/search-results-page.png`: results on the
+ * Two columns from `prototyping/explore/search/search-results-page.png`: results on the
  * left, the discover aside on the right, separated by a vertical hairline.
  */
 @Component({

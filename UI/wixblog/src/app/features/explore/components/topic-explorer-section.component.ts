@@ -5,7 +5,7 @@ import { TOPIC_SUBTOPICS, type TopicSubtopic } from '../data/topic-detail.data';
 import { TopicStoryRow } from './topic-story-row.component';
 
 /**
- * `protoyping/explore/topic/topic-exploer-section.png`
+ * `prototyping/explore/topic/topic-exploer-section.png`
  *
  * "Explore the Topic" heading, then a per-subtopic split: description on the left,
  * story list on the right. The last two subtopics in the reference are still loading,
@@ -19,7 +19,7 @@ import { TopicStoryRow } from './topic-story-row.component';
     <section>
       <h2 class="text-2xl font-bold tracking-tight">Explore the Topic</h2>
       <button type="button" class="text-muted-foreground hover:text-foreground mt-1 text-sm">
-        Suggested reads, summarized by AI ›
+        Suggested reads, summarized by AI â€º
       </button>
     </section>
 
@@ -29,9 +29,7 @@ import { TopicStoryRow } from './topic-story-row.component';
 
         <div class="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,22rem)_1fr]">
           <div>
-            <p class="text-muted-foreground text-sm">
-              {{ subtopic.storyCount }} stories
-            </p>
+            <p class="text-muted-foreground text-sm">{{ subtopic.storyCount }} stories</p>
             <p class="mt-1 text-sm font-semibold">{{ subtopic.description }}</p>
           </div>
 

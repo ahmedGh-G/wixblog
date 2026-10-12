@@ -1,15 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import {
-  lucideCircleHelp,
-  lucideContrast,
-  lucideSettings,
-} from '@ng-icons/lucide';
+import { lucideCircleHelp, lucideContrast, lucideSettings } from '@ng-icons/lucide';
 import { Router, RouterLink } from '@angular/router';
 import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 
-import { PATHS } from '../../../../context/paths';
+import { PATHS } from '@shared/paths';
 
 @Component({
   selector: 'app-user-profile-menu',
@@ -17,12 +13,7 @@ import { PATHS } from '../../../../context/paths';
   providers: [provideIcons({ lucideContrast, lucideSettings, lucideCircleHelp })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div
-      hlmDropdownMenu
-      class="min-w-[17.5rem] rounded-2xl p-0"
-      align="end"
-      sideOffset="8"
-    >
+    <div hlmDropdownMenu class="min-w-[17.5rem] rounded-2xl p-0" align="end" sideOffset="8">
       <div class="flex items-center gap-3 px-4 py-4">
         <hlm-avatar size="lg" class="shrink-0">
           @if (avatarUrl(); as src) {
@@ -108,8 +99,8 @@ export class UserProfileMenu {
 
   protected readonly footerLinks = [
     { label: 'About', path: PATHS.about },
-    { label: 'Blog', path: '/' },
-    { label: 'Careers', path: '/' },
+    { label: 'Blog', path: PATHS.home },
+    { label: 'Careers', path: PATHS.home },
     { label: 'Privacy', path: PATHS.privacy },
     { label: 'Terms', path: PATHS.terms },
   ];

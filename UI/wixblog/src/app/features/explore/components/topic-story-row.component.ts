@@ -41,7 +41,9 @@ import type { TopicStory } from '../data/topic-detail.data';
     <article class="relative border-b border-border py-6">
       <div class="flex items-center gap-2 text-sm">
         @if (story().publication; as pub) {
-          <span class="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase">
+          <span
+            class="bg-secondary text-secondary-foreground rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase"
+          >
             {{ pub }}
           </span>
         }

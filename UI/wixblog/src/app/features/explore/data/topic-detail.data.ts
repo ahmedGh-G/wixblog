@@ -193,7 +193,7 @@ export const POPULAR_STORIES: readonly TopicStory[] = [
     claps: 3000,
     comments: 44,
     reposts: 10,
-    publication: "In E²—Entertain Enlighten Empower by",
+    publication: 'In E²—Entertain Enlighten Empower by',
     relativeDate: 'Sep 30',
   },
   {
@@ -330,14 +330,13 @@ const WRITING_CRAFT_STORIES: readonly TopicStory[] = [
     publication: 'In Feeling Crafty by',
     relativeDate: 'Sep 8, 2025',
     aiSummary:
-      "Generic writing rules like \"write daily\" and \"show, don't tell\" work only when adapted to individual circumstances and writing goals, the author argues.",
+      'Generic writing rules like "write daily" and "show, don\'t tell" work only when adapted to individual circumstances and writing goals, the author argues.',
   },
   {
     id: 'w2',
     slug: 'writing-advice-thats-stuck',
     title: "Writing Advice That's Stuck",
-    excerpt:
-      'My favourite tips that helped me become a better writer and produce consistently.',
+    excerpt: 'My favourite tips that helped me become a better writer and produce consistently.',
     coverUrl: cover('writing-stuck'),
     author: { id: 'w2', name: 'Emily Rudov', avatarUrl: avatar(25) },
     category: null,
@@ -423,15 +422,13 @@ export const TOPIC_SUBTOPICS: readonly TopicSubtopic[] = [
   {
     label: 'Writing Craft',
     storyCount: 5,
-    description:
-      'Advice on becoming a writer, improving craft, and navigating the creative life.',
+    description: 'Advice on becoming a writer, improving craft, and navigating the creative life.',
     stories: WRITING_CRAFT_STORIES,
   },
   {
     label: 'Goals and Achievement',
     storyCount: 5,
-    description:
-      'Frameworks and strategies for defining goals and following through on them.',
+    description: 'Frameworks and strategies for defining goals and following through on them.',
     stories: [],
     pending: true,
   },
