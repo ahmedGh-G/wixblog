@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmInputGroupImports } from '@spartan-ng/helm/input-group';
 
-import { PATHS } from '../../../../../context/paths';
 import {
   EXPLORE_TOPICS_SEARCH_PLACEHOLDER,
   RECOMMENDED_TOPICS,
@@ -14,12 +13,14 @@ import {
 
 /**
  * Heading + pill search field + recommended row
- * (`protoyping/exploer/exploer-topics-section.png`).
+ * (`prototyping/exploer/exploer-topics-section.png`).
  *
  * The search filters the recommended row in place. It is deliberately not wired to
- * PATHS.search — that page does not exist yet, and a form that navigates nowhere would
- * be worse than one that filters what is already on screen.
+ * /search â€” a form that navigates nowhere would be worse than one that filters what is
+ * already on screen.
  */
+import { PATHS } from '@shared/paths';
+
 @Component({
   selector: 'app-explore-topics-search',
   imports: [RouterLink, NgIcon, HlmBadgeImports, HlmInputGroupImports],

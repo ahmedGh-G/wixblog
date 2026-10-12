@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
-import {RouterOutlet} from '@angular/router';
-import {AppShell} from './main/app-shell.component';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { AppShell } from './main/app-shell.component';
 
 /**
  * Shell for the reading + member area (routes branch ①).

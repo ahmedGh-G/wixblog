@@ -31,7 +31,9 @@ import { FeedDiscoverHeading } from './feed-discover-heading.component';
 
             <hlm-item-content>
               <hlm-item-title>
-                <a routerLink="/" class="text-[13px] font-bold hover:underline">{{ author.name }}</a>
+                <a routerLink="/" class="text-[13px] font-bold hover:underline">{{
+                  author.name
+                }}</a>
               </hlm-item-title>
               <hlm-item-description class="line-clamp-2 text-xs leading-relaxed">
                 {{ author.tagline }}

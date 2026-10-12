@@ -1,21 +1,22 @@
 import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { PATHS } from '../../../../../context/paths';
 import type { ExploreSubcategory } from '../data/explore-taxonomy.data';
 
 /**
  * A subcategory heading, its tag list, and the grey underlined "More"
- * (`protoyping/explore/category-subcategory-tags-list-example.png`).
+ * (`prototyping/explore/category-subcategory-tags-list-example.png`).
  *
- * A topic is the root of all three levels in this app — category, subcategory and tag
- * all resolve to the same page — so the heading and every tag link to PATHS.topic.
+ * A topic is the root of all three levels in this app â€” category, subcategory and tag
+ * all resolve to the same page â€” so the heading and every tag link to ['/topic', slug].
  *
  * "More" expands the subcategory in place, revealing `hiddenTags`. When the parent
  * category cell is expanded it passes `showAllTags`, which reveals them without
  * needing the per-subcategory control. In a filtered grid there is nothing hidden, so
  * neither control is rendered.
  */
+import { PATHS } from '@shared/paths';
+
 @Component({
   selector: 'app-explore-subcategory',
   imports: [RouterLink],
@@ -62,7 +63,6 @@ export class ExploreSubcategoryComponent {
   readonly showAllTags = input(false);
 
   protected readonly expanded = signal(false);
-
   protected readonly PATHS = PATHS;
 
   protected readonly showMoreControl = () =>

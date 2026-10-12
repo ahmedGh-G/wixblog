@@ -3,7 +3,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight, lucideCompass } from '@ng-icons/lucide';
 import { Router } from '@angular/router';
 
-import { PATHS } from '../../../../context/paths';
+import { PATHS } from '@shared/paths';
 
 @Component({
   selector: 'app-topbar-explore-popup',
@@ -27,7 +27,11 @@ import { PATHS } from '../../../../context/paths';
           <ng-icon name="lucideCompass" class="size-3.5" aria-hidden="true" />
         </span>
         <span class="flex-1 text-sm font-medium">Explore topics</span>
-        <ng-icon name="lucideChevronRight" class="text-muted-foreground size-4" aria-hidden="true" />
+        <ng-icon
+          name="lucideChevronRight"
+          class="text-muted-foreground size-4"
+          aria-hidden="true"
+        />
       </button>
     </div>
   `,

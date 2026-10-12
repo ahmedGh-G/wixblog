@@ -8,11 +8,12 @@
 *.sw?
 
 # === Angular Client (UI Project) ===
-UI/node_modules/
-UI/dist/
-UI/.angular/
-UI/.tmp/
-UI/protoyping/
+UI/wixblog/node_modules/
+UI/wixblog/dist/
+UI/wixblog/.angular/
+UI/wixblog/.tmp/
+UI/wixblog/protoyping/
+UI/wixblog/context
 
 # === Spring Boot Server (Server Project) ===
 Server/wixblog/target/

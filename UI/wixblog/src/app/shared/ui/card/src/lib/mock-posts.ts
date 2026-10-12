@@ -172,4 +172,186 @@ export const MOCK_POST_DTOS: PostSummaryDto[] = [
     publishedAt: '2026-09-23T15:40:00Z',
     readingTimeMinutes: 7,
   },
+
+  {
+    id: 13,
+    slug: 'the-case-for-boring-interfaces',
+    title: 'The case for boring interfaces',
+    excerpt:
+      'Novelty is a cost, not a feature. Why the products people trust most are the ones that stopped trying to surprise them.',
+    coverImageUrl: cover('boring'),
+    ...SOFIA,
+    ...DES,
+    publishedAt: '2026-09-22T13:20:00Z',
+    readingTimeMinutes: 8,
+  },
+
+  {
+    id: 14,
+    slug: 'restraint-is-a-feature',
+    title: 'Restraint is a feature',
+    excerpt:
+      'Every element you remove is a decision you no longer have to defend. A short argument for shipping less.',
+    coverImageUrl: cover('restraint'),
+    ...SOFIA,
+    ...DES,
+    publishedAt: '2026-09-21T09:45:00Z',
+    readingTimeMinutes: 5,
+  },
+
+  {
+    id: 15,
+    slug: 'the-two-hour-writes',
+    title: 'The two-hour writes',
+    excerpt:
+      'Not every morning needs to be productive. Some are for thinking, and thinking rarely fits into a to-do list.',
+    coverImageUrl: cover('twohours'),
+    ...JANE,
+    ...WRI,
+    publishedAt: '2026-09-20T07:10:00Z',
+    readingTimeMinutes: 6,
+  },
+
+  {
+    id: 16,
+    slug: 'notes-i-actually-keep',
+    title: 'The notes I actually keep',
+    excerpt:
+      'I stopped keeping notes for future me. Here is what survived a year of ruthless deleting.',
+    coverImageUrl: cover('notes'),
+    ...JANE,
+    ...PROD,
+    publishedAt: '2026-09-19T08:30:00Z',
+    readingTimeMinutes: 5,
+  },
+
+  {
+    id: 17,
+    slug: 'against-the-morning-routine',
+    title: 'Against the morning routine',
+    excerpt:
+      'The five-step sunrise ritual is not a system. Sometimes the first hour of the day belongs to somebody else.',
+    coverImageUrl: cover('morningroutine'),
+    ...JANE,
+    ...WRI,
+    publishedAt: '2026-09-18T06:55:00Z',
+    readingTimeMinutes: 7,
+  },
+
+  {
+    id: 18,
+    slug: 'signals-where-rxjs-is-not',
+    title: 'Signals where RxJS is not (and the reverse)',
+    excerpt:
+      'A field guide to the overlap: which of the two you reach for when the two both technically work.',
+    coverImageUrl: cover('signalswhere'),
+    ...OMAR,
+    ...ENG,
+    publishedAt: '2026-09-17T10:15:00Z',
+    readingTimeMinutes: 11,
+  },
+
+  {
+    id: 19,
+    slug: 'the-honest-onboarding-doc',
+    title: 'The honest onboarding doc',
+    excerpt:
+      'Most onboarding docs are marketing. A short template for writing the one a new engineer would actually save.',
+    coverImageUrl: cover('onboarding'),
+    ...OMAR,
+    ...ENG,
+    publishedAt: '2026-09-16T09:20:00Z',
+    readingTimeMinutes: 8,
+  },
+
+  {
+    id: 20,
+    slug: 'delete-the-abstraction',
+    title: 'Delete the abstraction',
+    excerpt:
+      'Three layers of indirection later, nobody could name the thing it was wrapping. A note on premature design.',
+    coverImageUrl: cover('abstraction'),
+    ...OMAR,
+    ...ENG,
+    publishedAt: '2026-09-15T14:40:00Z',
+    readingTimeMinutes: 9,
+  },
+
+  {
+    id: 21,
+    slug: 'code-review-is-a-writing-skill',
+    title: 'Code review is a writing skill',
+    excerpt:
+      'The comment you leave is read by a person with a hard day. Clarity there is as valuable as the fix itself.',
+    coverImageUrl: cover('codereview'),
+    ...LIAM,
+    ...ENG,
+    publishedAt: '2026-09-14T11:05:00Z',
+    readingTimeMinutes: 6,
+  },
+
+  {
+    id: 22,
+    slug: 'feature-flags-forever',
+    title: 'Feature flags forever',
+    excerpt:
+      'We added one to ship safely and kept them for years. What that did to our codebase, and what we would undo.',
+    coverImageUrl: cover('flags'),
+    ...LIAM,
+    ...ENG,
+    publishedAt: '2026-09-13T16:30:00Z',
+    readingTimeMinutes: 10,
+  },
+
+  {
+    id: 23,
+    slug: 'the-build-that-took-four-hours',
+    title: 'The build that took four hours',
+    excerpt:
+      'It was not one problem. It was a hundred small permissions, each reasonable on its own.',
+    coverImageUrl: cover('build'),
+    ...LIAM,
+    ...ENG,
+    publishedAt: '2026-09-12T13:00:00Z',
+    readingTimeMinutes: 7,
+  },
+
+  {
+    id: 24,
+    slug: 'notes-from-the-migration',
+    title: 'Notes from the migration',
+    excerpt:
+      'Eighteen months of moving a legacy system, written down so the next person does not have to rediscover it.',
+    coverImageUrl: cover('migration'),
+    ...AMINA,
+    ...ENG,
+    publishedAt: '2026-09-11T10:50:00Z',
+    readingTimeMinutes: 12,
+  },
+
+  {
+    id: 25,
+    slug: 'the-two-minute-rule-is-wrong',
+    title: "The two-minute rule is wrong",
+    excerpt:
+      'Tasks that take two minutes are rarely two minutes, and the list they land on is never the list you read.',
+    coverImageUrl: cover('twominute'),
+    ...AMINA,
+    ...PROD,
+    publishedAt: '2026-09-10T09:25:00Z',
+    readingTimeMinutes: 5,
+  },
+
+  {
+    id: 26,
+    slug: 'what-i-stopped-tracking',
+    title: 'What I stopped tracking',
+    excerpt:
+      'Habit apps made me good at recording habits and no better at keeping them. The metrics I dropped and why.',
+    coverImageUrl: cover('tracking'),
+    ...AMINA,
+    ...PROD,
+    publishedAt: '2026-09-09T15:45:00Z',
+    readingTimeMinutes: 6,
+  },
 ];

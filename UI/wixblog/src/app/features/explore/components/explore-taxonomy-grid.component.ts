@@ -4,17 +4,17 @@ import type { ExploreCategory } from '../data/explore-taxonomy.data';
 import { ExploreCategoryCell } from './explore-category-cell.component';
 
 /**
- * The category → subcategory → tag grid
- * (`protoyping/explore/explore-topics-fullpage.png`).
+ * The category â†’ subcategory â†’ tag grid
+ * (`prototyping/explore/explore-topics-fullpage.png`).
  *
- * Geometry is taken from `protoyping/explore/taxonomy-grid layring.png`, where a
- * devtools inspection reports the grid element itself as **1080 × 904.51** with three
+ * Geometry is taken from `prototyping/explore/taxonomy-grid layring.png`, where a
+ * devtools inspection reports the grid element itself as **1080 Ã— 904.51** with three
  * equal-width columns:
  *
- *     (1080 − 2 × 40px gap) / 3 = 333.33px per column
+ *     (1080 âˆ’ 2 Ã— 40px gap) / 3 = 333.33px per column
  *
  * The parent page wraps this in a 1080px container, so the grid fills it exactly. Cells
- * carry no inner padding — headings, subcategory names and tags all sit flush to the
+ * carry no inner padding â€” headings, subcategory names and tags all sit flush to the
  * 1080px edges, as the overlay shows.
  *
  * This is a real CSS grid, not masonry: cells in a row stretch to equal height, which

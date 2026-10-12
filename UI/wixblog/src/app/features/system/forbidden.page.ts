@@ -12,9 +12,7 @@ import { RouterLink } from '@angular/router';
       <p class="max-w-md text-sm text-muted-foreground">
         Your account is signed in but lacks the required permission.
       </p>
-      <a routerLink="/" class="text-sm font-medium underline underline-offset-4">
-        Back to home
-      </a>
+      <a routerLink="/" class="text-sm font-medium underline underline-offset-4"> Back to home </a>
     </section>
   `,
   styles: [],

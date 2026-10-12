@@ -10,19 +10,19 @@ import { TopicFeaturedStories } from '../components/topic-featured-stories.compo
 import { TopicHeader } from '../components/topic-header.component';
 
 /**
- * `/topic/**` — see PATHS.topic(slug), i.e. ['/topic', slug].
+ * `/topic/**` â€” i.e. ['/topic', slug].
  *
  * A topic is the root of all three taxonomy levels, so the same page serves a
  * category ("life"), a subcategory ("life/family") and a tag ("adoption"). The slug
  * decides which: it is matched against EXPLORE_TAXONOMY to find the nearest node, and
  * falls back to the generic header when nothing matches.
  *
- * Composes `protoyping/explore/topic/` top to bottom:
+ * Composes `prototyping/explore/topic/` top to bottom:
  *   1. TopicHeader            (topic-header-section.png)
  *   2. TopicFeaturedStories   (selected(featured)-topic-stories.png)
  *   3. TopicExplorerSection   (topic-exploer-section.png)
  *
- * One centred column with 24px gutters — the main content is centred in the page.
+ * One centred column with 24px gutters â€” the main content is centred in the page.
  */
 @Component({
   selector: 'app-topic-page',

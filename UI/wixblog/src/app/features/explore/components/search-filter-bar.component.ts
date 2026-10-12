@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 export type SearchTab = 'stories' | 'people' | 'publications' | 'topics' | 'lists';
 
 /**
- * `protoyping/explore/search/search-results-filter-bar.png`
+ * `prototyping/explore/search/search-results-filter-bar.png`
  *
  * Stories / People / Publications / Topics / Lists with the active tab underlined.
  * Only Stories renders results for now; the other tabs carry the active state but have
