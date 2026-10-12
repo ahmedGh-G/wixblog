@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OutputEmitterRef,
-  computed,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, OutputEmitterRef, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideBold,
@@ -16,7 +8,7 @@ import {
   lucideMinus,
   lucidePlus,
   lucideQuote,
-  lucideX,
+  lucideX
 } from '@ng-icons/lucide';
 
 /** One tool in the expanding menu. Holds its own emitter so the template stays flat. */
@@ -37,7 +29,7 @@ interface EditorToolbarTool {
  * Presentation only. Every action is emitted upward so the page can call the Editor.js
  * API; this component never touches the editor instance.
  *
- * All template and styles are inline, per `agent.md` section 1.
+ * All template and styles are inline, per `AGENT.md` section 1.
  */
 @Component({
   selector: 'app-editor-inline-toolbar',
@@ -151,15 +143,6 @@ export class EditorInlineToolbar {
 
   /** Whether the panel is expanded. */
   readonly open = signal(false);
-
-  /** Collapsed fits the single toggle; expanded fits the toggle plus six 2.25rem tools. */
-  private readonly collapsedWidth = 2.25;
-  private readonly expandedWidth = 18.5;
-
-  protected readonly panelWidth = computed(() =>
-    this.open() ? this.expandedWidth : this.collapsedWidth,
-  );
-
   protected readonly tools: readonly EditorToolbarTool[] = [
     { id: 'image', icon: 'lucideImagePlus', label: 'Insert image', emit: this.image },
     { id: 'bold', icon: 'lucideBold', label: 'Bold', emit: this.bold },
@@ -168,6 +151,12 @@ export class EditorInlineToolbar {
     { id: 'quote', icon: 'lucideQuote', label: 'Quote', emit: this.quote },
     { id: 'separator', icon: 'lucideMinus', label: 'Insert separator', emit: this.separator },
   ];
+  /** Collapsed fits the single toggle; expanded fits the toggle plus six 2.25rem tools. */
+  private readonly collapsedWidth = 2.25;
+  private readonly expandedWidth = 18.5;
+  protected readonly panelWidth = computed(() =>
+    this.open() ? this.expandedWidth : this.collapsedWidth,
+  );
 
   protected toggle = () => {
     if (this.disabled()) return;
