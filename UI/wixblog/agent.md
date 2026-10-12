@@ -1,7 +1,10 @@
 # OpenCode Engineering Conventions
 
+<<<<<<< HEAD
 These rules apply in **both Plan mode and Build mode**. Follow them exactly. If a rule conflicts with your own judgment, follow the rule and ask the user (see section 6).
 
+=======
+>>>>>>> origin/main
 ## 1. Architectural Mandates
 
 - **Component Architecture:** Every single Angular component generated must be 100% standalone.
@@ -9,6 +12,7 @@ These rules apply in **both Plan mode and Build mode**. Follow them exactly. If 
   - Use `template: \`...\`` for templates.
   - Use `styles: [\`...\`]` for component-specific styles when necessary, heavily leaning on Tailwind CSS.
 - **Change Detection:** Enforce `changeDetection: ChangeDetectionStrategy.OnPush` across all generated components.
+<<<<<<< HEAD
 - **Code Comments (crucial):** Comment **only the important code blocks**. Do not add comments to blocks that do not need them. A comment must explain **why**, never restate **what** the code already says.
   - **Comment these:**
     - non-obvious business rules or invariants (for example, "only PUBLISHED posts accept comments"),
@@ -24,6 +28,8 @@ These rules apply in **both Plan mode and Build mode**. Follow them exactly. If 
     - closing braces, change logs, or commented-out code.
   - **Style:** one short line is preferred. No JSDoc blocks on every function. Do not add or remove comments in code you are not otherwise changing.
   - The visible placeholder labels and `data-section` attributes from the page pipeline (section 4) are **not** comments and must still be added.
+=======
+>>>>>>> origin/main
 
 ## 2. Directory Layout Architecture
 
@@ -39,6 +45,7 @@ When implementing any feature under `src/app/features/`, you must enforce the fo
 
 ## 3. Scope Restriction Guardrails
 
+<<<<<<< HEAD
 - **No Heavy Scans:** Do not execute automated recursive directory scans (`Get-ChildItem` or deep folder loops) as it causes terminal runtime crashes. List one folder level at a time, or open the exact file you need.
 - **Strict Adherence:** Treat commented out pathways inside `app.routes.ts` and `paths.ts` as forbidden zones. Do not invent or scaffold them.
 
@@ -193,3 +200,7 @@ How to ask:
 - **Plan mode:** end the plan with an "Open questions" list. Do not treat the plan as final until they are answered.
 - **Build mode:** stop before the uncertain step. Do not edit files in the same turn as the question.
 - Do not ask about things this file already decides.
+=======
+- **No Heavy Scans:** Do not execute automated recursive directory scans (`Get-ChildItem` or deep folder loops) as it causes terminal runtime crashes.
+- **Strict Adherence:** Treat commented out pathways inside `app.routes.ts` and `paths.ts` as forbidden zones. Do not invent or scaffold them.
+>>>>>>> origin/main
